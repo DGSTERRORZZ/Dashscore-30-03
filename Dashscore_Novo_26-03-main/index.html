@@ -544,6 +544,7 @@
             });
         }
         
+        
         function setupFilters() {
             document.querySelectorAll('.filter-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -596,6 +597,104 @@
         renderFeaturedPlayers();
         setupFilters();
     </script>
+
+<!-- Seção do Analista de Mercado -->
+<div class="market-analyst-section">
+    <h2>🔥 ANALISTA DE MERCADO - JOGADORES PARA INVESTIR</h2>
+    <div class="invest-grid" id="investmentContainer"></div>
+    
+    <h2>🌟 PROMESSAS DA BASE 2026</h2>
+    <div class="prospects-grid" id="prospectsContainer"></div>
+    
+    <h2>💬 ESPECULAÇÃO DO DIA</h2>
+    <div class="rumors-grid" id="rumorsContainer"></div>
+    
+    <h2>💼 SUA CARTEIRA DE INVESTIMENTOS</h2>
+    <div class="portfolio-grid" id="portfolioContainer"></div>
+</div>
+
+<script src="js/players-data.js"></script>
+<script src="js/market-analyst.js"></script>
+<script>
+    // Inicializar Analista de Mercado quando o DOM estiver pronto
+    document.addEventListener('DOMContentLoaded', function() {
+        if (typeof initMarketAnalyst === 'function') {
+            initMarketAnalyst();
+        }
+    });
+    
+    // Atualizar carteira quando o usuário fizer login/logout
+    const originalUpdateUserStatus = window.updateUserStatus;
+    window.updateUserStatus = function() {
+        if (originalUpdateUserStatus) originalUpdateUserStatus();
+        if (typeof renderPortfolio === 'function') renderPortfolio();
+        if (typeof renderInvestmentCards === 'function') renderInvestmentCards();
+        if (typeof renderProspects === 'function') renderProspects();
+        if (typeof renderRumors === 'function') renderRumors();
+    };
+</script>
+
+<!-- Seção do Teste do Olheiro -->
+<div class="market-analyst-section" id="scoutGameSection">
+    <div id="scoutGame"></div>
+</div>
+
+<!-- Seção de Ranking -->
+<div class="ranking-section">
+    <h2>🏆 RANKING DE INVESTIDORES</h2>
+    <div id="rankingContainer"></div>
+</div>
+
+<script src="js/scout-game.js"></script>
+<script src="js/ranking.js"></script>
+<script>
+    // Inicializar Teste do Olheiro
+    if (typeof initScoutGame === 'function') {
+        initScoutGame();
+    }
+    
+    // Inicializar Ranking
+    if (typeof renderRanking === 'function') {
+        renderRanking();
+        
+        // Atualizar ranking quando o usuário fizer login/logout
+        const originalUpdate = window.updateUserStatus;
+        window.updateUserStatus = function() {
+            if (originalUpdate) originalUpdate();
+            if (typeof renderRanking === 'function') renderRanking();
+            if (typeof initScoutGame === 'function') initScoutGame();
+        };
+    }
+</script>
+<!-- Botão de atualização manual -->
+<div style="text-align: right; margin-bottom: 20px;">
+    <button id="manualUpdateBtn" class="btn-main" style="background: #ff8c00; padding: 10px 20px;">
+        🔄 Atualizar Dados do FBref
+    </button>
+    <span id="lastUpdateInfo" style="margin-left: 15px; color: #aaa; font-size: 12px;"></span>
+</div>
+
+<script>
+// Carregar informações da última atualização
+async function loadLastUpdateInfo() {
+    try {
+        const response = await fetch('public/data/players_stats.json');
+        const data = await response.json();
+        if (data && data.last_update) {
+            document.getElementById('lastUpdateInfo').innerHTML = `📅 Última atualização: ${data.last_update}`;
+        }
+    } catch (e) {
+        console.log('Aguardando primeira atualização');
+    }
+}
+
+// Botão de atualização - abre instruções
+document.getElementById('manualUpdateBtn')?.addEventListener('click', () => {
+    alert('📌 Para atualizar os dados:\n\n1. Abra o terminal na pasta do projeto\n2. Digite: python update_data.py\n3. Aguarde a mensagem "ATUALIZADO!"\n4. Recarregue esta página');
+});
+
+loadLastUpdateInfo();
+</script>
 
 </body>
 </html>

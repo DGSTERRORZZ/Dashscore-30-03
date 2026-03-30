@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vitória - Dashscore</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .club-hero { background: linear-gradient(135deg, #c41e3a 0%, #8b0000 100%); padding: 60px 40px; border-radius: 30px; margin-bottom: 30px; color: white; text-align: center; }
+        .club-hero h1 { font-size: 48px; margin-bottom: 20px; }
+        .club-hero .club-badge { font-size: 80px; margin-bottom: 20px; }
+        .club-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #ececec; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 5px 5px 0 rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .stat-card .stat-value { font-size: 32px; font-weight: bold; color: #c41e3a; }
+        .section-title { font-size: 28px; margin: 30px 0 20px; color: #333; border-left: 5px solid #c41e3a; padding-left: 15px; }
+        .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .player-card-club { background: #ececec; border-radius: 20px; padding: 15px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
+        .player-card-club:hover { transform: translateY(-5px); }
+        .player-avatar { width: 60px; height: 60px; background: #c41e3a; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; }
+        .player-info-club h4 { font-size: 18px; margin-bottom: 5px; }
+        .player-info-club p { font-size: 12px; color: #666; }
+        .transfers-list { background: #ececec; border-radius: 20px; padding: 20px; margin-bottom: 30px; }
+        .transfer-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #ddd; }
+        .transfer-item:last-child { border-bottom: none; }
+        .history-text { background: #ececec; border-radius: 20px; padding: 25px; line-height: 1.6; margin-bottom: 30px; }
+        .curiosities-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .curiosity-item { background: #ececec; border-radius: 15px; padding: 15px; border-left: 4px solid #c41e3a; }
+        .back-btn { display: inline-block; background: #3f5da8; color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; margin-bottom: 20px; transition: 0.2s; }
+        .back-btn:hover { background: #2f4b93; transform: translateX(-5px); }
+        .favorite-btn { background: none; border: 2px solid #ffd966; border-radius: 30px; padding: 8px 20px; color: #ffd966; cursor: pointer; font-size: 14px; transition: 0.2s; margin-top: 10px; }
+        .favorite-btn.active { background: #ffd966; color: #333; }
+        .favorite-btn:hover { background: #ffd966; color: #333; }
+        .auth-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .auth-modal-overlay.active { display: flex; }
+        .auth-modal { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 28px; width: 90%; max-width: 450px; overflow: hidden; }
+        .auth-modal-header { background: #0f0f1a; padding: 24px 28px; border-bottom: 2px solid #3f5da8; display: flex; justify-content: space-between; align-items: center; }
+        .auth-modal-header h2 { color: #fff; margin: 0; font-size: 24px; }
+        .auth-close { background: none; border: none; font-size: 32px; color: #fff; cursor: pointer; }
+        .auth-modal-body { padding: 28px; }
+        .auth-input-group { margin-bottom: 20px; }
+        .auth-input-group label { display: block; margin-bottom: 8px; color: #ddd; font-size: 14px; }
+        .auth-input-group input { width: 100%; padding: 12px 16px; border: 2px solid #2a2a3a; border-radius: 16px; background: #25253a; color: #fff; font-size: 15px; }
+        .auth-input-group input:focus { outline: none; border-color: #3f5da8; }
+        .auth-btn-primary { width: 100%; padding: 14px; background: #3f5da8; border: none; border-radius: 16px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .auth-btn-primary:hover { background: #2f4b93; }
+        .auth-switch { text-align: center; margin-top: 20px; color: #aaa; }
+        .auth-switch a { color: #3f5da8; text-decoration: none; }
+        .auth-error { background: rgba(255,75,75,0.2); border-left: 3px solid #ff4b4b; padding: 10px; border-radius: 12px; margin: 15px 0; color: #ff9b9b; font-size: 13px; display: none; }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo"><img src="../images/logo.png" class="logo-icon" alt="Logo Dashscore">DASHSCORE</div>
+        <div class="search"><img src="../images/search.png" class="search-icon" alt="Pesquisar"><input type="text" placeholder="Pesquisar jogadores, clubes e seleções"></div>
+        <div class="menu-icons"><img src="../images/shield.png" class="icon" alt="Escudo"><button class="login" id="loginBtn">ENTRAR</button><span class="menu-symbol" id="userInfo" style="display: none;">👤</span><span class="menu-symbol" id="logoutBtn" style="display: none;">🚪</span><span class="menu-symbol">⚙️</span></div>
+    </header>
+    <main style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+        <a href="../index.html" class="back-btn">← Voltar para página inicial</a>
+        <div class="club-hero"><img src="../images/escudos/escudo-vitoria.png" alt="Escudo Vitória" style="width: 80px; height: 80px; object-fit: contain; border-radius: 50%;">
+        <h1>Esporte Clube Vitória</h1><p>O Leão da Barra - O Mais Querido da Bahia</p><button class="favorite-btn" id="favoriteTeamBtn">⭐ Favoritar Time</button></div>
+        <div class="club-stats"><div class="stat-card"><h3>🏆 Brasileirão</h3><div class="stat-value">0</div><small>Melhor: 3º lugar (2013)</small></div><div class="stat-card"><h3>🏆 Copa do Nordeste</h3><div class="stat-value">3</div><small>2010, 2013, 2025</small></div><div class="stat-card"><h3>🏟️ Estádio</h3><div class="stat-value">Barradão</div><small>Capacidade: 35.000</small></div><div class="stat-card"><h3>📅 Fundação</h3><div class="stat-value">1899</div><small>13 de maio</small></div></div>
+        <h2 class="section-title">⭐ Elenco Principal 2026</h2>
+        <div class="players-grid" id="playersGrid"></div>
+        <h2 class="section-title">🔄 Últimas Transferências</h2>
+        <div class="transfers-list"><div class="transfer-item"><span><strong>Erick</strong> (Atacante)</span><span>➡️ Chegada - €2M</span><span>Ceará → Vitória</span></div><div class="transfer-item"><span><strong>Aitor</strong> (Ponta)</span><span>➡️ Chegada - €1.5M</span><span>Real Sociedad B → Vitória</span></div><div class="transfer-item"><span><strong>Ramon</strong> (Volante)</span><span>➡️ Chegada - €1M</span><span>Atlético-MG → Vitória</span></div><div class="transfer-item"><span><strong>Riccieli</strong> (Zagueiro)</span><span>➡️ Chegada - €1M</span><span>Famalicão → Vitória</span></div><div class="transfer-item"><span><strong>Gabriel</strong> (Goleiro)</span><span>➡️ Permanência</span><span>Renovação até 2027</span></div></div>
+        <h2 class="section-title">📖 História</h2>
+        <div class="history-text"><p>Fundado em 13 de maio de 1899, o Esporte Clube Vitória é um dos clubes mais tradicionais da Bahia e do Nordeste. Conhecido como "Leão da Barra", o clube tem uma história rica e uma torcida apaixonada.</p><p style="margin-top: 15px;">O Vitória teve sua melhor campanha no Campeonato Brasileiro em 2013, quando terminou na 3ª posição, garantindo vaga na Libertadores. O clube também é conhecido por revelar grandes talentos como Vampeta, Dida, Bebeto e David Luiz.</p><p style="margin-top: 15px;">Após um período na Série B, o Vitória retornou à elite do futebol brasileiro em 2025 com uma campanha histórica. O clube também é o maior vencedor do Campeonato Baiano, com 30 títulos estaduais.</p><p style="margin-top: 15px;">O Estádio Manoel Barradas, o Barradão, é a casa do Leão e um dos estádios mais tradicionais do Nordeste, conhecido por sua atmosfera vibrante e pela força da torcida.</p></div>
+        <h2 class="section-title">✨ Curiosidades</h2>
+        <div class="curiosities-list"><div class="curiosity-item"><strong>🏆 Rei da Copa do Nordeste</strong><p>O Vitória é o terceiro maior vencedor da Copa do Nordeste, com 3 títulos.</p></div><div class="curiosity-item"><strong>⚽ Maior artilheiro</strong><p>Osni, com 170 gols entre 1976-1984.</p></div><div class="curiosity-item"><strong>🌟 Revelações</strong><p>Vampeta (Campeão do Mundo em 2002), Dida, Bebeto, David Luiz e Petkovic.</p></div><div class="curiosity-item"><strong>🎵 Hino</strong><p>"Vitória, Vitória, meu Leão, és o mais querido do meu coração..."</p></div><div class="curiosity-item"><strong>🌊 Barradão</strong><p>O estádio foi inaugurado em 1951 e é conhecido por ser um dos mais difíceis de se jogar como visitante.</p></div><div class="curiosity-item"><strong>🏆 Tríplice Coroa Baiana</strong><p>Em 2013, o Vitória conquistou o Campeonato Baiano, a Copa do Nordeste e foi 3º lugar no Brasileirão.</p></div></div>
+    </main>
+    <footer style="text-align: center; padding: 20px; margin-top: 40px;"><p>Dashscore © 2026</p></footer>
+    
+    <div class="auth-modal-overlay" id="loginModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Entrar</h2><button class="auth-close" id="closeLoginBtn">&times;</button></div><div class="auth-modal-body"><form id="loginForm"><div class="auth-input-group"><label>Usuário ou Email</label><input type="text" id="loginUsername" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="loginPassword" required></div><button type="submit" class="auth-btn-primary">Entrar</button></form><p class="auth-switch">Não tem conta? <a href="#" id="showRegisterBtn">Cadastre-se</a></p></div></div></div>
+    <div class="auth-modal-overlay" id="registerModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Criar conta</h2><button class="auth-close" id="closeRegisterBtn">&times;</button></div><div class="auth-modal-body"><form id="registerForm"><div class="auth-input-group"><label>Usuário</label><input type="text" id="regUsername" required></div><div class="auth-input-group"><label>Email</label><input type="email" id="regEmail" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="regPassword" required></div><div class="auth-input-group"><label>Confirmar Senha</label><input type="password" id="regConfirmPassword" required></div><div id="registerError" class="auth-error"></div><button type="submit" class="auth-btn-primary">Cadastrar</button></form><p class="auth-switch">Já tem conta? <a href="#" id="showLoginBtn">Faça login</a></p></div></div></div>
+
+    <script>
+        const vitoriaSquad = [
+            { name: "Gabriel", position: "Goleiro", number: 1 }, { name: "Lucas Arcanjo", position: "Goleiro", number: 12 }, { name: "Muriel", position: "Goleiro", number: 23 },
+            { name: "Zeca", position: "Lateral Direito", number: 2 }, { name: "Raul Cáceres", position: "Lateral Direito", number: 22 }, { name: "Willean Lepo", position: "Lateral Direito", number: 27 },
+            { name: "Riccieli", position: "Zagueiro", number: 4 }, { name: "Camutanga", position: "Zagueiro", number: 3 }, { name: "Dankler", position: "Zagueiro", number: 14 }, { name: "João Victor", position: "Zagueiro", number: 33 },
+            { name: "Léo Gomes", position: "Lateral Esquerdo", number: 6 }, { name: "Patric Calmon", position: "Lateral Esquerdo", number: 16 }, { name: "Hugo", position: "Lateral Esquerdo", number: 26 },
+            { name: "Ramon", position: "Volante", number: 8 }, { name: "Rodrigo Andrade", position: "Volante", number: 5 }, { name: "Léo Ceará", position: "Volante", number: 15 }, { name: "Matheus Trindade", position: "Volante", number: 17 },
+            { name: "Aitor", position: "Meia", number: 7 }, { name: "Osvaldo", position: "Meia", number: 10 }, { name: "Daniel Jr", position: "Meia", number: 11 }, { name: "Edu", position: "Meia", number: 20 },
+            { name: "Erick", position: "Atacante", number: 9 }, { name: "Wesley", position: "Atacante", number: 19 }, { name: "Iury Castilho", position: "Atacante", number: 21 }, { name: "Thiago", position: "Atacante", number: 18 }, { name: "David", position: "Ponta", number: 77 }
+        ];
+        const playersGrid = document.getElementById('playersGrid');
+        if (playersGrid) { playersGrid.innerHTML = vitoriaSquad.map(player => `<div class="player-card-club"><div class="player-avatar">${player.number}</div><div class="player-info-club"><h4>${player.name}</h4><p>${player.position}</p></div></div>`).join(''); }
+        const favoriteBtn = document.getElementById('favoriteTeamBtn');
+        if (favoriteBtn) { const isFav = localStorage.getItem('fav_team_vitoria'); if (isFav) favoriteBtn.classList.add('active'); favoriteBtn.addEventListener('click', () => { if (localStorage.getItem('currentUser')) { favoriteBtn.classList.toggle('active'); if (favoriteBtn.classList.contains('active')) { localStorage.setItem('fav_team_vitoria', 'true'); alert('Vitória adicionado aos favoritos!'); } else { localStorage.removeItem('fav_team_vitoria'); alert('Vitória removido dos favoritos!'); } } else { alert('⚠️ Faça login para favoritar times!'); document.getElementById('loginModal').classList.add('active'); } }); }
+        
+        let users = JSON.parse(localStorage.getItem('users') || '[]');
+        function registerUser(username, email, password, confirmPassword) { if (!username || !email || !password || !confirmPassword) return { success: false, message: "Preencha todos os campos!" }; if (password !== confirmPassword) return { success: false, message: "As senhas não coincidem!" }; if (users.find(u => u.username === username)) return { success: false, message: "Usuário já existe!" }; if (users.find(u => u.email === email)) return { success: false, message: "Email já cadastrado!" }; if (password.length < 8) return { success: false, message: "Senha deve ter no mínimo 8 caracteres!" }; if (!/[A-Z]/.test(password)) return { success: false, message: "Senha deve ter pelo menos 1 letra maiúscula!" }; if (!/[a-z]/.test(password)) return { success: false, message: "Senha deve ter pelo menos 1 letra minúscula!" }; if (!/[!@#$%^&*]/.test(password)) return { success: false, message: "Senha deve ter pelo menos 1 caractere especial!" }; if (password.toLowerCase().includes(username.toLowerCase())) return { success: false, message: "Senha não pode conter seu nome de usuário!" }; const newUser = { id: Date.now(), username, email, password, favorites: { players: [], teams: [], lineups: [] }, savedLineups: [] }; users.push(newUser); localStorage.setItem('users', JSON.stringify(users)); return { success: true, message: "Cadastro realizado!" }; }
+        function loginUser(identifier, password) { const user = users.find(u => u.username === identifier || u.email === identifier); if (!user) return { success: false, message: "Usuário não encontrado!" }; if (user.password !== password) return { success: false, message: "Senha incorreta!" }; localStorage.setItem('currentUser', JSON.stringify(user)); return { success: true, message: "Login realizado!" }; }
+        function updateUserStatus() { const currentUser = localStorage.getItem('currentUser'); const loginBtn = document.getElementById('loginBtn'); const userInfo = document.getElementById('userInfo'); const logoutBtn = document.getElementById('logoutBtn'); if (currentUser) { const user = JSON.parse(currentUser); if (loginBtn) loginBtn.style.display = 'none'; if (userInfo) { userInfo.style.display = 'inline-block'; userInfo.textContent = `👤 ${user.username}`; } if (logoutBtn) logoutBtn.style.display = 'inline-block'; } else { if (loginBtn) loginBtn.style.display = 'inline-block'; if (userInfo) userInfo.style.display = 'none'; if (logoutBtn) logoutBtn.style.display = 'none'; } }
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.removeItem('currentUser'); updateUserStatus(); alert('Você saiu!'); location.reload(); }); updateUserStatus();
+        const loginModal = document.getElementById('loginModal'), registerModal = document.getElementById('registerModal');
+        document.getElementById('loginBtn')?.addEventListener('click', () => loginModal.classList.add('active'));
+        document.getElementById('showRegisterBtn')?.addEventListener('click', (e) => { e.preventDefault(); loginModal.classList.remove('active'); registerModal.classList.add('active'); });
+        document.getElementById('showLoginBtn')?.addEventListener('click', (e) => { e.preventDefault(); registerModal.classList.remove('active'); loginModal.classList.add('active'); });
+        document.getElementById('closeLoginBtn')?.addEventListener('click', () => loginModal.classList.remove('active'));
+        document.getElementById('closeRegisterBtn')?.addEventListener('click', () => registerModal.classList.remove('active'));
+        window.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.remove('active'); if (e.target === registerModal) registerModal.classList.remove('active'); });
+        document.getElementById('loginForm')?.addEventListener('submit', (e) => { e.preventDefault(); const result = loginUser(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value); if (result.success) { loginModal.classList.remove('active'); location.reload(); } else alert(result.message); });
+        document.getElementById('registerForm')?.addEventListener('submit', (e) => { e.preventDefault(); const result = registerUser(document.getElementById('regUsername').value, document.getElementById('regEmail').value, document.getElementById('regPassword').value, document.getElementById('regConfirmPassword').value); if (result.success) { alert(result.message); registerModal.classList.remove('active'); loginModal.classList.add('active'); } else { document.getElementById('registerError').textContent = result.message; document.getElementById('registerError').style.display = 'block'; } });
+    function updateUserStatus() {
+            const currentUser = sessionStorage.getItem('currentUser');
+            const userStatusCard = document.getElementById('userStatusContent');
+            const loginBtn = document.getElementById('loginBtn');
+            const userInfo = document.getElementById('userInfo');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            // Atualizar favoritos quando o usuário mudar
+            userFavorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
+            renderUserFavorites();
+            renderFeaturedPlayers();
+
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                if (userStatusCard) {
+                    userStatusCard.innerHTML = `
+                        <p style="color: #2ecc71;">✅ Logado como: <strong>${user.username}</strong></p>
+                        <p>Email: ${user.email}</p>
+                        <p>Você tem acesso a todas as funcionalidades!</p>
+                    `;
+                }
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (userInfo) {
+                    userInfo.style.display = 'inline-block';
+                    userInfo.textContent = `👤 ${user.username}`;
+                }
+                if (logoutBtn) logoutBtn.style.display = 'inline-block';
+            } else {
+                if (userStatusCard) {
+                    userStatusCard.innerHTML = `
+                        <p>Faça login para salvar suas escalações favoritas e ter acesso a recursos exclusivos!</p>
+                        <button class="btn-main" style="padding: 8px 16px; font-size: 14px; margin-top: 10px;" id="quickLoginBtn">Fazer Login</button>
+                    `;
+                    const quickLoginBtn = document.getElementById('quickLoginBtn');
+                    if (quickLoginBtn) {
+                        quickLoginBtn.addEventListener('click', () => {
+                            document.getElementById('loginModal').classList.add('active');
+                        });
+                    }
+                }
+                if (loginBtn) loginBtn.style.display = 'inline-block';
+                if (userInfo) userInfo.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+            }
+        }
+        
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('currentUser');
+                updateUserStatus();
+                alert('Você saiu da sua conta!');
+            });
+        }
+        
+        // Inicializar
+        updateUserStatus();
+        renderFeaturedPlayers();
+        setupFilters();
+    </script>
+        <script src="../js/settings.js"></script>
+    <script>
+        // Atualizar status do usuário
+        function updateClubUserStatus() {
+            const currentUser = sessionStorage.getItem('currentUser');
+            const loginBtn = document.getElementById('loginBtn');
+            const userInfo = document.getElementById('userInfo');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (userInfo) {
+                    userInfo.style.display = 'inline-block';
+                    userInfo.textContent = `👤 ${user.username}`;
+                }
+                if (logoutBtn) logoutBtn.style.display = 'inline-block';
+            } else {
+                if (loginBtn) loginBtn.style.display = 'inline-block';
+                if (userInfo) userInfo.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            updateClubUserStatus();
+            
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    sessionStorage.removeItem('currentUser');
+                    updateClubUserStatus();
+                    alert('Você saiu da sua conta!');
+                    location.reload();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

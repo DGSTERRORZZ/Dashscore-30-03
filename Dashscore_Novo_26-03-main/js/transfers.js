@@ -23,7 +23,15 @@ const transfersData = [
     { id: 22, player: "Endrick", from: "Palmeiras", to: "Real Madrid", value: 60000000, valueStr: "€60M", position: "Atacante", date: "2026-02-01", status: "confirmed", flag: "🇧🇷", image: "endrick.png" },
     { id: 23, player: "Estevão", from: "Palmeiras", to: "Chelsea", value: 35000000, valueStr: "€35M", position: "Atacante", date: "2026-02-15", status: "confirmed", flag: "🇧🇷", image: "estevao.png" },
     { id: 24, player: "Marcos Leonardo", from: "Santos", to: "Benfica", value: 18000000, valueStr: "€18M", position: "Atacante", date: "2026-01-05", status: "confirmed", flag: "🇧🇷", image: "marcos-leonardo.png" },
-    { id: 25, player: "Luiz Henrique", from: "Botafogo", to: "Zenit", value: 25000000, valueStr: "€25M", position: "Atacante", date: "2026-01-18", status: "confirmed", flag: "🇧🇷", image: "luiz-henrique.png" }
+    { id: 25, player: "Luiz Henrique", from: "Botafogo", to: "Zenit", value: 25000000, valueStr: "€25M", position: "Atacante", date: "2026-01-18", status: "confirmed", flag: "🇧🇷", image: "luiz-henrique.png" },
+    // NOVAS TRANSFERÊNCIAS
+    { id: 26, player: "Neymar Jr", from: "Al-Hilal", to: "Santos", value: 0, valueStr: "Livre (Rumor)", position: "Atacante", date: "2026-06-15", status: "rumor", flag: "🇧🇷", image: "neymar.png" },
+    { id: 27, player: "Paulinho", from: "Atlético-MG", to: "Corinthians", value: 8000000, valueStr: "€8M", position: "Atacante", date: "2026-06-10", status: "rumor", flag: "🇧🇷", image: "paulinho.png" },
+    { id: 28, player: "Gabriel Jesus", from: "Arsenal", to: "Palmeiras", value: 25000000, valueStr: "€25M", position: "Atacante", date: "2026-06-20", status: "speculation", flag: "🇧🇷", image: "gabriel-jesus.png" },
+    { id: 29, player: "Richarlison", from: "Tottenham", to: "Flamengo", value: 20000000, valueStr: "€20M", position: "Atacante", date: "2026-06-18", status: "rumor", flag: "🇧🇷", image: "richarlison.png" },
+    { id: 30, player: "Casemiro", from: "Manchester United", to: "São Paulo", value: 12000000, valueStr: "€12M", position: "Volante", date: "2026-06-12", status: "speculation", flag: "🇧🇷", image: "casemiro.png" },
+    { id: 31, player: "Danilo", from: "Juventus", to: "Vasco", value: 5000000, valueStr: "€5M", position: "Lateral", date: "2026-06-08", status: "rumor", flag: "🇧🇷", image: "danilo.png" },
+    { id: 32, player: "Arthur", from: "Juventus", to: "Grêmio", value: 6000000, valueStr: "€6M", position: "Meia", date: "2026-06-14", status: "rumor", flag: "🇧🇷", image: "arthur.png" }
 ];
 
 let currentPage = 1;
@@ -39,7 +47,8 @@ function getClubFileName(clubName) {
         "West Ham": "westham", "Atletico Madrid": "atletico-madrid", "Juventus": "juventus",
         "Barcelona": "barcelona", "Fulham": "fulham", "Benfica": "benfica",
         "Real Madrid": "real-madrid", "Chelsea": "chelsea", "Galatasaray": "galatasaray",
-        "Zenit": "zenit", "Al-Nassr": "al-nassr"
+        "Zenit": "zenit", "Al-Nassr": "al-nassr", "Al-Hilal": "al-hilal",
+        "Tottenham": "tottenham", "Manchester United": "manchester-united"
     };
     return clubMap[clubName] || clubName.toLowerCase().replace(/ /g, '-');
 }
@@ -239,8 +248,41 @@ function setupTransferEvents() {
     });
 }
 
+// Atualizar status do usuário na página de transferências
+function updateTransferUserStatus() {
+    const currentUser = sessionStorage.getItem('currentUser');
+    const loginBtn = document.getElementById('loginBtn');
+    const userInfo = document.getElementById('userInfo');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    if (currentUser) {
+        const user = JSON.parse(currentUser);
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (userInfo) {
+            userInfo.style.display = 'inline-block';
+            userInfo.textContent = `👤 ${user.username}`;
+        }
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    } else {
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (userInfo) userInfo.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'none';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     populateClubFilters();
     applyFilters();
     setupTransferEvents();
+    updateTransferUserStatus();
+    
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            sessionStorage.removeItem('currentUser');
+            updateTransferUserStatus();
+            alert('Você saiu da sua conta!');
+            location.reload();
+        });
+    }
 });

@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Botafogo - Dashscore</title>
     <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="../css/auth.css">
     <style>
         .club-hero { background: linear-gradient(135deg, #000000 0%, #2c2c2c 100%); padding: 60px 40px; border-radius: 30px; margin-bottom: 30px; color: white; text-align: center; }
         .club-hero h1 { font-size: 48px; margin-bottom: 20px; }
-        .club-hero .club-badge { font-size: 80px; margin-bottom: 20px; }
+        .club-badge img { width: 80px; height: 80px; object-fit: contain; border-radius: 50%; background: white; padding: 5px; margin-bottom: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
         .club-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
         .stat-card { background: #ececec; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 5px 5px 0 rgba(0,0,0,0.1); }
         .stat-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
@@ -31,139 +32,147 @@
         .favorite-btn { background: none; border: 2px solid #ffd966; border-radius: 30px; padding: 8px 20px; color: #ffd966; cursor: pointer; font-size: 14px; transition: 0.2s; margin-top: 10px; }
         .favorite-btn.active { background: #ffd966; color: #333; }
         .favorite-btn:hover { background: #ffd966; color: #333; }
-        .auth-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; }
-        .auth-modal-overlay.active { display: flex; }
-        .auth-modal { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 28px; width: 90%; max-width: 450px; overflow: hidden; }
-        .auth-modal-header { background: #0f0f1a; padding: 24px 28px; border-bottom: 2px solid #3f5da8; display: flex; justify-content: space-between; align-items: center; }
-        .auth-modal-header h2 { color: #fff; margin: 0; font-size: 24px; }
-        .auth-close { background: none; border: none; font-size: 32px; color: #fff; cursor: pointer; }
-        .auth-modal-body { padding: 28px; }
-        .auth-input-group { margin-bottom: 20px; }
-        .auth-input-group label { display: block; margin-bottom: 8px; color: #ddd; font-size: 14px; }
-        .auth-input-group input { width: 100%; padding: 12px 16px; border: 2px solid #2a2a3a; border-radius: 16px; background: #25253a; color: #fff; font-size: 15px; }
-        .auth-input-group input:focus { outline: none; border-color: #3f5da8; }
-        .auth-btn-primary { width: 100%; padding: 14px; background: #3f5da8; border: none; border-radius: 16px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
-        .auth-btn-primary:hover { background: #2f4b93; }
-        .auth-switch { text-align: center; margin-top: 20px; color: #aaa; }
-        .auth-switch a { color: #3f5da8; text-decoration: none; }
-        .auth-error { background: rgba(255,75,75,0.2); border-left: 3px solid #ff4b4b; padding: 10px; border-radius: 12px; margin: 15px 0; color: #ff9b9b; font-size: 13px; display: none; }
     </style>
 </head>
 <body>
+
     <header class="topbar">
         <div class="logo"><img src="../images/logo.png" class="logo-icon" alt="Logo Dashscore">DASHSCORE</div>
         <div class="search"><img src="../images/search.png" class="search-icon" alt="Pesquisar"><input type="text" placeholder="Pesquisar jogadores, clubes e seleções"></div>
-        <div class="menu-icons"><img src="../images/shield.png" class="icon" alt="Escudo"><button class="login" id="loginBtn">ENTRAR</button><span class="menu-symbol" id="userInfo" style="display: none;">👤</span><span class="menu-symbol" id="logoutBtn" style="display: none;">🚪</span><span class="menu-symbol">⚙️</span></div>
+        <div class="menu-icons">
+            <img src="../images/shield.png" class="icon" alt="Escudo">
+            <button class="login" id="loginBtn">ENTRAR</button>
+            <span class="menu-symbol" id="userInfo" style="display: none;">👤</span>
+            <span class="menu-symbol" id="logoutBtn" style="display: none;">🚪</span>
+            <span class="menu-symbol">⚙️</span>
+        </div>
     </header>
+
     <main style="max-width: 1200px; margin: 0 auto; padding: 20px;">
         <a href="../index.html" class="back-btn">← Voltar para página inicial</a>
-        <div class="club-hero"><div class="club-badge"><img src="../images/escudos/escudo-botafogo.png" alt="Escudo Botafogo" style="width: 80px; height: 80px; object-fit: contain; border-radius: 50%;"></div>
-        <h1>Botafogo de Futebol e Regatas</h1><p>O Glorioso - Campeão da América</p><button class="favorite-btn" id="favoriteTeamBtn">⭐ Favoritar Time</button></div>
-        <div class="club-stats"><div class="stat-card"><h3>🏆 Brasileirões</h3><div class="stat-value">2</div><small>1968, 1995</small></div><div class="stat-card"><h3>🌎 Libertadores</h3><div class="stat-value">1</div><small>2024</small></div><div class="stat-card"><h3>🏟️ Estádio</h3><div class="stat-value">Nilton Santos</div><small>Capacidade: 44.661</small></div><div class="stat-card"><h3>📅 Fundação</h3><div class="stat-value">1904</div><small>1º de julho</small></div></div>
+        
+        <div class="club-hero">
+            <div class="club-badge">
+                <img src="../images/escudos/escudo-botafogo.png" alt="Escudo Botafogo">
+            </div>
+            <h1>Botafogo de Futebol e Regatas</h1>
+            <p>O Glorioso - Campeão da América</p>
+            <button class="favorite-btn" id="favoriteTeamBtn">⭐ Favoritar Time</button>
+        </div>
+        
+        <div class="club-stats">
+            <div class="stat-card"><h3>🏆 Brasileirões</h3><div class="stat-value">2</div><small>1968, 1995</small></div>
+            <div class="stat-card"><h3>🌎 Libertadores</h3><div class="stat-value">1</div><small>2024</small></div>
+            <div class="stat-card"><h3>🏟️ Estádio</h3><div class="stat-value">Nilton Santos</div><small>Capacidade: 44.661</small></div>
+            <div class="stat-card"><h3>📅 Fundação</h3><div class="stat-value">1904</div><small>1º de julho</small></div>
+        </div>
+        
         <h2 class="section-title">⭐ Elenco Principal 2026</h2>
         <div class="players-grid" id="playersGrid"></div>
+        
         <h2 class="section-title">🔄 Últimas Transferências</h2>
-        <div class="transfers-list"><div class="transfer-item"><span><strong>Arthur Cabral</strong> (Atacante)</span><span>➡️ Chegada - €12M</span><span>Benfica → Botafogo</span></div><div class="transfer-item"><span><strong>Artur</strong> (Ponta)</span><span>➡️ Chegada - €10M</span><span>Zenit → Botafogo</span></div><div class="transfer-item"><span><strong>Alex Telles</strong> (Lateral)</span><span>➡️ Chegada - €7M</span><span>Al-Nassr → Botafogo</span></div><div class="transfer-item"><span><strong>Danilo Barbosa</strong> (Volante)</span><span>➡️ Chegada - €5M</span><span>Nice → Botafogo</span></div><div class="transfer-item"><span><strong>Luiz Henrique</strong> (Atacante)</span><span>⬅️ Saída - €25M</span><span>Botafogo → Zenit</span></div></div>
+        <div class="transfers-list">
+            <div class="transfer-item"><span><strong>Arthur Cabral</strong> (Atacante)</span><span>➡️ Chegada - €12M</span><span>Benfica → Botafogo</span></div>
+            <div class="transfer-item"><span><strong>Artur</strong> (Ponta)</span><span>➡️ Chegada - €10M</span><span>Zenit → Botafogo</span></div>
+            <div class="transfer-item"><span><strong>Alex Telles</strong> (Lateral)</span><span>➡️ Chegada - €7M</span><span>Al-Nassr → Botafogo</span></div>
+            <div class="transfer-item"><span><strong>Danilo Barbosa</strong> (Volante)</span><span>➡️ Chegada - €5M</span><span>Nice → Botafogo</span></div>
+            <div class="transfer-item"><span><strong>Luiz Henrique</strong> (Atacante)</span><span>⬅️ Saída - €25M</span><span>Botafogo → Zenit</span></div>
+        </div>
+        
         <h2 class="section-title">📖 História</h2>
-        <div class="history-text"><p>Fundado em 1º de julho de 1904, o Botafogo é um dos clubes mais tradicionais do Rio de Janeiro. Conhecido como "Glorioso", o clube teve sua era de ouro nos anos 1960, com grandes jogadores como Garrincha, Nilton Santos, Didi e Zagallo.</p><p style="margin-top: 15px;">Após um período de jejum, o Botafogo voltou ao topo em 2024 ao conquistar a Copa Libertadores da América, vencendo o Atlético-MG na final. O clube também foi campeão brasileiro em 1968 e 1995.</p><p style="margin-top: 15px;">O Estádio Nilton Santos, antigo Engenhão, é a casa do Glorioso e foi palco da conquista da Libertadores em 2024.</p></div>
+        <div class="history-text">
+            <p>Fundado em 1º de julho de 1904, o Botafogo é um dos clubes mais tradicionais do Rio de Janeiro. Conhecido como "Glorioso", o clube teve sua era de ouro nos anos 1960, com grandes jogadores como Garrincha, Nilton Santos, Didi e Zagallo.</p>
+            <p style="margin-top: 15px;">Após um período de jejum, o Botafogo voltou ao topo em 2024 ao conquistar a Copa Libertadores da América, vencendo o Atlético-MG na final. O clube também foi campeão brasileiro em 1968 e 1995.</p>
+            <p style="margin-top: 15px;">O Estádio Nilton Santos, antigo Engenhão, é a casa do Glorioso e foi palco da conquista da Libertadores em 2024.</p>
+        </div>
+        
         <h2 class="section-title">✨ Curiosidades</h2>
-        <div class="curiosities-list"><div class="curiosity-item"><strong>🌟 Garrincha</strong><p>O "Anjo das Pernas Tortas" é considerado o maior ídolo da história do Botafogo.</p></div><div class="curiosity-item"><strong>⚽ Maior artilheiro</strong><p>Quarentinha, com 306 gols entre 1954-1964.</p></div><div class="curiosity-item"><strong>🏆 Invencibilidade</strong><p>Em 1977, o Botafogo ficou 39 jogos invicto, recorde do clube.</p></div><div class="curiosity-item"><strong>🎵 Hino</strong><p>"Botafogo, Botafogo, campeão desde 1910..."</p></div></div>
+        <div class="curiosities-list">
+            <div class="curiosity-item"><strong>🌟 Garrincha</strong><p>O "Anjo das Pernas Tortas" é considerado o maior ídolo da história do Botafogo.</p></div>
+            <div class="curiosity-item"><strong>⚽ Maior artilheiro</strong><p>Quarentinha, com 306 gols entre 1954-1964.</p></div>
+            <div class="curiosity-item"><strong>🏆 Invencibilidade</strong><p>Em 1977, o Botafogo ficou 39 jogos invicto, recorde do clube.</p></div>
+        </div>
     </main>
-    <footer style="text-align: center; padding: 20px; margin-top: 40px;"><p>Dashscore © 2026</p></footer>
     
-    <div class="auth-modal-overlay" id="loginModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Entrar</h2><button class="auth-close" id="closeLoginBtn">&times;</button></div><div class="auth-modal-body"><form id="loginForm"><div class="auth-input-group"><label>Usuário ou Email</label><input type="text" id="loginUsername" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="loginPassword" required></div><button type="submit" class="auth-btn-primary">Entrar</button></form><p class="auth-switch">Não tem conta? <a href="#" id="showRegisterBtn">Cadastre-se</a></p></div></div></div>
-    <div class="auth-modal-overlay" id="registerModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Criar conta</h2><button class="auth-close" id="closeRegisterBtn">&times;</button></div><div class="auth-modal-body"><form id="registerForm"><div class="auth-input-group"><label>Usuário</label><input type="text" id="regUsername" required></div><div class="auth-input-group"><label>Email</label><input type="email" id="regEmail" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="regPassword" required></div><div class="auth-input-group"><label>Confirmar Senha</label><input type="password" id="regConfirmPassword" required></div><div id="registerError" class="auth-error"></div><button type="submit" class="auth-btn-primary">Cadastrar</button></form><p class="auth-switch">Já tem conta? <a href="#" id="showLoginBtn">Faça login</a></p></div></div></div>
+    <footer style="text-align: center; padding: 20px; margin-top: 40px;"><p>Dashscore © 2026</p></footer>
 
+    <div class="auth-modal-overlay" id="loginModal">
+        <div class="auth-modal">
+            <div class="auth-modal-header"><h2>Entrar</h2><button class="auth-close" id="closeLoginBtn">&times;</button></div>
+            <div class="auth-modal-body">
+                <form id="loginForm">
+                    <div class="auth-input-group"><label>Usuário ou Email</label><input type="text" id="loginUsername" required></div>
+                    <div class="auth-input-group"><label>Senha</label><input type="password" id="loginPassword" required></div>
+                    <button type="submit" class="auth-btn-primary">Entrar</button>
+                </form>
+                <p class="auth-switch">Não tem conta? <a href="#" id="showRegisterBtn">Cadastre-se</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-modal-overlay" id="registerModal">
+        <div class="auth-modal">
+            <div class="auth-modal-header"><h2>Criar conta</h2><button class="auth-close" id="closeRegisterBtn">&times;</button></div>
+            <div class="auth-modal-body">
+                <form id="registerForm">
+                    <div class="auth-input-group"><label>Usuário</label><input type="text" id="regUsername" required></div>
+                    <div class="auth-input-group"><label>Email</label><input type="email" id="regEmail" required></div>
+                    <div class="auth-input-group"><label>Senha</label><input type="password" id="regPassword" required></div>
+                    <div class="auth-input-group"><label>Confirmar Senha</label><input type="password" id="regConfirmPassword" required></div>
+                    <div id="registerError" class="auth-error"></div>
+                    <button type="submit" class="auth-btn-primary">Cadastrar</button>
+                </form>
+                <p class="auth-switch">Já tem conta? <a href="#" id="showLoginBtn">Faça login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="../js/auth.js"></script>
     <script>
         const botafogoSquad = [
-            { name: "Léo Linck", position: "Goleiro", number: 1 }, { name: "John", position: "Goleiro", number: 12 }, { name: "Gatito", position: "Goleiro", number: 26 },
+            { name: "Léo Linck", position: "Goleiro", number: 1 }, { name: "John", position: "Goleiro", number: 12 },
             { name: "Vitinho", position: "Lateral Direito", number: 2 }, { name: "Mateo Ponte", position: "Lateral Direito", number: 22 },
-            { name: "Barboza", position: "Zagueiro", number: 4 }, { name: "Bastos", position: "Zagueiro", number: 3 }, { name: "Marçal", position: "Zagueiro", number: 6 }, { name: "Lucas Halter", position: "Zagueiro", number: 14 },
+            { name: "Barboza", position: "Zagueiro", number: 4 }, { name: "Bastos", position: "Zagueiro", number: 3 }, { name: "Lucas Halter", position: "Zagueiro", number: 14 },
             { name: "Alex Telles", position: "Lateral Esquerdo", number: 13 }, { name: "Cuiabano", position: "Lateral Esquerdo", number: 16 },
             { name: "Danilo Barbosa", position: "Volante", number: 5 }, { name: "Marlon Freitas", position: "Volante", number: 17 }, { name: "Newton", position: "Volante", number: 8 },
             { name: "Santi Rodríguez", position: "Meia", number: 10 }, { name: "Eduardo", position: "Meia", number: 33 },
             { name: "Artur", position: "Ponta", number: 7 }, { name: "Vitinho", position: "Ponta", number: 11 }, { name: "Júnior Santos", position: "Atacante", number: 11 },
             { name: "Arthur Cabral", position: "Centroavante", number: 9 }, { name: "Matheus Nascimento", position: "Centroavante", number: 90 }
         ];
-        const playersGrid = document.getElementById('playersGrid');
-        if (playersGrid) { playersGrid.innerHTML = botafogoSquad.map(player => `<div class="player-card-club"><div class="player-avatar">${player.number}</div><div class="player-info-club"><h4>${player.name}</h4><p>${player.position}</p></div></div>`).join(''); }
-        const favoriteBtn = document.getElementById('favoriteTeamBtn');
-        if (favoriteBtn) { const isFav = localStorage.getItem('fav_team_botafogo'); if (isFav) favoriteBtn.classList.add('active'); favoriteBtn.addEventListener('click', () => { if (localStorage.getItem('currentUser')) { favoriteBtn.classList.toggle('active'); if (favoriteBtn.classList.contains('active')) { localStorage.setItem('fav_team_botafogo', 'true'); alert('Botafogo adicionado aos favoritos!'); } else { localStorage.removeItem('fav_team_botafogo'); alert('Botafogo removido dos favoritos!'); } } else { alert('⚠️ Faça login para favoritar times!'); document.getElementById('loginModal').classList.add('active'); } }); }
         
-        let users = JSON.parse(localStorage.getItem('users') || '[]');
-        function registerUser(username, email, password, confirmPassword) { if (!username || !email || !password || !confirmPassword) return { success: false, message: "Preencha todos os campos!" }; if (password !== confirmPassword) return { success: false, message: "As senhas não coincidem!" }; if (users.find(u => u.username === username)) return { success: false, message: "Usuário já existe!" }; if (users.find(u => u.email === email)) return { success: false, message: "Email já cadastrado!" }; if (password.length < 8) return { success: false, message: "Senha deve ter no mínimo 8 caracteres!" }; if (!/[A-Z]/.test(password)) return { success: false, message: "Senha deve ter pelo menos 1 letra maiúscula!" }; if (!/[a-z]/.test(password)) return { success: false, message: "Senha deve ter pelo menos 1 letra minúscula!" }; if (!/[!@#$%^&*]/.test(password)) return { success: false, message: "Senha deve ter pelo menos 1 caractere especial!" }; if (password.toLowerCase().includes(username.toLowerCase())) return { success: false, message: "Senha não pode conter seu nome de usuário!" }; const newUser = { id: Date.now(), username, email, password, favorites: { players: [], teams: [], lineups: [] }, savedLineups: [] }; users.push(newUser); localStorage.setItem('users', JSON.stringify(users)); return { success: true, message: "Cadastro realizado!" }; }
-        function loginUser(identifier, password) { const user = users.find(u => u.username === identifier || u.email === identifier); if (!user) return { success: false, message: "Usuário não encontrado!" }; if (user.password !== password) return { success: false, message: "Senha incorreta!" }; localStorage.setItem('currentUser', JSON.stringify(user)); return { success: true, message: "Login realizado!" }; }
-        function updateUserStatus() { const currentUser = localStorage.getItem('currentUser'); const loginBtn = document.getElementById('loginBtn'); const userInfo = document.getElementById('userInfo'); const logoutBtn = document.getElementById('logoutBtn'); if (currentUser) { const user = JSON.parse(currentUser); if (loginBtn) loginBtn.style.display = 'none'; if (userInfo) { userInfo.style.display = 'inline-block'; userInfo.textContent = `👤 ${user.username}`; } if (logoutBtn) logoutBtn.style.display = 'inline-block'; } else { if (loginBtn) loginBtn.style.display = 'inline-block'; if (userInfo) userInfo.style.display = 'none'; if (logoutBtn) logoutBtn.style.display = 'none'; } }
-        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.removeItem('currentUser'); updateUserStatus(); alert('Você saiu!'); location.reload(); }); updateUserStatus();
-        const loginModal = document.getElementById('loginModal'), registerModal = document.getElementById('registerModal');
-        document.getElementById('loginBtn')?.addEventListener('click', () => loginModal.classList.add('active'));
-        document.getElementById('showRegisterBtn')?.addEventListener('click', (e) => { e.preventDefault(); loginModal.classList.remove('active'); registerModal.classList.add('active'); });
-        document.getElementById('showLoginBtn')?.addEventListener('click', (e) => { e.preventDefault(); registerModal.classList.remove('active'); loginModal.classList.add('active'); });
-        document.getElementById('closeLoginBtn')?.addEventListener('click', () => loginModal.classList.remove('active'));
-        document.getElementById('closeRegisterBtn')?.addEventListener('click', () => registerModal.classList.remove('active'));
-        window.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.remove('active'); if (e.target === registerModal) registerModal.classList.remove('active'); });
-        document.getElementById('loginForm')?.addEventListener('submit', (e) => { e.preventDefault(); const result = loginUser(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value); if (result.success) { loginModal.classList.remove('active'); location.reload(); } else alert(result.message); });
-        document.getElementById('registerForm')?.addEventListener('submit', (e) => { e.preventDefault(); const result = registerUser(document.getElementById('regUsername').value, document.getElementById('regEmail').value, document.getElementById('regPassword').value, document.getElementById('regConfirmPassword').value); if (result.success) { alert(result.message); registerModal.classList.remove('active'); loginModal.classList.add('active'); } else { document.getElementById('registerError').textContent = result.message; document.getElementById('registerError').style.display = 'block'; } });
-    
-    function updateUserStatus() {
-            const currentUser = sessionStorage.getItem('currentUser');
-            const userStatusCard = document.getElementById('userStatusContent');
-            const loginBtn = document.getElementById('loginBtn');
-            const userInfo = document.getElementById('userInfo');
-            const logoutBtn = document.getElementById('logoutBtn');
-            
-            // Atualizar favoritos quando o usuário mudar
-            userFavorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
-            renderUserFavorites();
-            renderFeaturedPlayers();
-
-            if (currentUser) {
-                const user = JSON.parse(currentUser);
-                if (userStatusCard) {
-                    userStatusCard.innerHTML = `
-                        <p style="color: #2ecc71;">✅ Logado como: <strong>${user.username}</strong></p>
-                        <p>Email: ${user.email}</p>
-                        <p>Você tem acesso a todas as funcionalidades!</p>
-                    `;
-                }
-                if (loginBtn) loginBtn.style.display = 'none';
-                if (userInfo) {
-                    userInfo.style.display = 'inline-block';
-                    userInfo.textContent = `👤 ${user.username}`;
-                }
-                if (logoutBtn) logoutBtn.style.display = 'inline-block';
-            } else {
-                if (userStatusCard) {
-                    userStatusCard.innerHTML = `
-                        <p>Faça login para salvar suas escalações favoritas e ter acesso a recursos exclusivos!</p>
-                        <button class="btn-main" style="padding: 8px 16px; font-size: 14px; margin-top: 10px;" id="quickLoginBtn">Fazer Login</button>
-                    `;
-                    const quickLoginBtn = document.getElementById('quickLoginBtn');
-                    if (quickLoginBtn) {
-                        quickLoginBtn.addEventListener('click', () => {
-                            document.getElementById('loginModal').classList.add('active');
-                        });
-                    }
-                }
-                if (loginBtn) loginBtn.style.display = 'inline-block';
-                if (userInfo) userInfo.style.display = 'none';
-                if (logoutBtn) logoutBtn.style.display = 'none';
-            }
+        const playersGrid = document.getElementById('playersGrid');
+        if (playersGrid) {
+            playersGrid.innerHTML = botafogoSquad.map(player => `
+                <div class="player-card-club">
+                    <div class="player-avatar">${player.number}</div>
+                    <div class="player-info-club">
+                        <h4>${player.name}</h4>
+                        <p>${player.position}</p>
+                    </div>
+                </div>
+            `).join('');
         }
         
-        const logoutBtn = document.getElementById('logoutBtn');
-        if (logoutBtn) {
-            logoutBtn.addEventListener('click', () => {
-                sessionStorage.removeItem('currentUser');
-                updateUserStatus();
-                alert('Você saiu da sua conta!');
+        const favoriteBtn = document.getElementById('favoriteTeamBtn');
+        if (favoriteBtn) {
+            const isFav = localStorage.getItem('fav_team_botafogo');
+            if (isFav) favoriteBtn.classList.add('active');
+            favoriteBtn.addEventListener('click', () => {
+                if (sessionStorage.getItem('currentUser')) {
+                    favoriteBtn.classList.toggle('active');
+                    if (favoriteBtn.classList.contains('active')) {
+                        localStorage.setItem('fav_team_botafogo', 'true');
+                        alert('Botafogo adicionado aos favoritos!');
+                    } else {
+                        localStorage.removeItem('fav_team_botafogo');
+                        alert('Botafogo removido dos favoritos!');
+                    }
+                } else {
+                    alert('⚠️ Faça login para favoritar times!');
+                    document.getElementById('loginModal').classList.add('active');
+                }
             });
         }
-        
-        // Inicializar
-        updateUserStatus();
-        renderFeaturedPlayers();
-        setupFilters();
     </script>
 </body>
 </html>

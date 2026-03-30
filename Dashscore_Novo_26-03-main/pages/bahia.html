@@ -100,6 +100,7 @@
     
     <div class="auth-modal-overlay" id="loginModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Entrar</h2><button class="auth-close" id="closeLoginBtn">&times;</button></div><div class="auth-modal-body"><form id="loginForm"><div class="auth-input-group"><label>Usuário ou Email</label><input type="text" id="loginUsername" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="loginPassword" required></div><button type="submit" class="auth-btn-primary">Entrar</button></form><p class="auth-switch">Não tem conta? <a href="#" id="showRegisterBtn">Cadastre-se</a></p></div></div></div>
     <div class="auth-modal-overlay" id="registerModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Criar conta</h2><button class="auth-close" id="closeRegisterBtn">&times;</button></div><div class="auth-modal-body"><form id="registerForm"><div class="auth-input-group"><label>Usuário</label><input type="text" id="regUsername" required></div><div class="auth-input-group"><label>Email</label><input type="email" id="regEmail" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="regPassword" required></div><div class="auth-input-group"><label>Confirmar Senha</label><input type="password" id="regConfirmPassword" required></div><div id="registerError" class="auth-error"></div><button type="submit" class="auth-btn-primary">Cadastrar</button></form><p class="auth-switch">Já tem conta? <a href="#" id="showLoginBtn">Faça login</a></p></div></div></div>
+    <script>
 function updateUserStatus() {
             const currentUser = sessionStorage.getItem('currentUser');
             const userStatusCard = document.getElementById('userStatusContent');
@@ -159,5 +160,82 @@ function updateUserStatus() {
         updateUserStatus();
         renderFeaturedPlayers();
         setupFilters();
+        </script>
+            <script src="../js/settings.js"></script>
+    <script>
+        // Atualizar status do usuário
+        function updateClubUserStatus() {
+            const currentUser = sessionStorage.getItem('currentUser');
+            const loginBtn = document.getElementById('loginBtn');
+            const userInfo = document.getElementById('userInfo');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (userInfo) {
+                    userInfo.style.display = 'inline-block';
+                    userInfo.textContent = `👤 ${user.username}`;
+                }
+                if (logoutBtn) logoutBtn.style.display = 'inline-block';
+            } else {
+                if (loginBtn) loginBtn.style.display = 'inline-block';
+                if (userInfo) userInfo.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            updateClubUserStatus();
+            
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    sessionStorage.removeItem('currentUser');
+                    updateClubUserStatus();
+                    alert('Você saiu da sua conta!');
+                    location.reload();
+                });
+            }
+        });
+    </script>
+        <script src="../js/settings.js"></script>
+    <script>
+        // Atualizar status do usuário
+        function updateClubUserStatus() {
+            const currentUser = sessionStorage.getItem('currentUser');
+            const loginBtn = document.getElementById('loginBtn');
+            const userInfo = document.getElementById('userInfo');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (userInfo) {
+                    userInfo.style.display = 'inline-block';
+                    userInfo.textContent = `👤 ${user.username}`;
+                }
+                if (logoutBtn) logoutBtn.style.display = 'inline-block';
+            } else {
+                if (loginBtn) loginBtn.style.display = 'inline-block';
+                if (userInfo) userInfo.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            updateClubUserStatus();
+            
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    sessionStorage.removeItem('currentUser');
+                    updateClubUserStatus();
+                    alert('Você saiu da sua conta!');
+                    location.reload();
+                });
+            }
+        });
+    </script>
 </body>
 </html>

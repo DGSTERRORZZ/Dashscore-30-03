@@ -1,3 +1,5 @@
+// ==================== SISTEMA DE AUTENTICAÇÃO ====================
+
 let users = JSON.parse(localStorage.getItem('users') || '[]');
 
 function validatePassword(password, username) {
@@ -39,60 +41,45 @@ function loginUser(identifier, password) {
     const user = users.find(u => u.username === identifier || u.email === identifier);
     if (!user) return { success: false, message: "Usuário ou email não encontrado!" };
     if (user.password !== password) return { success: false, message: "Senha incorreta!" };
-    // USANDO sessionStorage EM VEZ DE localStorage - ao fechar a aba ou dar F5, o login some
     sessionStorage.setItem('currentUser', JSON.stringify(user));
     return { success: true, message: "Login realizado com sucesso!", user };
 }
 
-function logoutUser() { 
-    sessionStorage.removeItem('currentUser'); 
-}
+// ==================== FUNÇÕES GLOBAIS ====================
 
-function getCurrentUser() {
-    const userStr = sessionStorage.getItem('currentUser');
-    return userStr ? JSON.parse(userStr) : null;
-}
-
-function addFavorite(type, id, data) {
-    const user = getCurrentUser();
-    if (!user) return false;
-    const userIndex = users.findIndex(u => u.id === user.id);
-    if (userIndex === -1) return false;
-    if (type === 'player') {
-        if (!users[userIndex].favorites.players.find(p => p.id === id)) users[userIndex].favorites.players.push(data);
-    } else if (type === 'team') {
-        if (!users[userIndex].favorites.teams.find(t => t.id === id)) users[userIndex].favorites.teams.push(data);
-    } else if (type === 'lineup') {
-        if (!users[userIndex].favorites.lineups.find(l => l.id === id)) users[userIndex].favorites.lineups.push(data);
+window.updateUserStatus = function() {
+    const currentUser = sessionStorage.getItem('currentUser');
+    const loginBtn = document.getElementById('loginBtn');
+    const userInfo = document.getElementById('userInfo');
+    const logoutBtn = document.getElementById('logoutBtn');
+    
+    console.log('Atualizando status do usuário:', currentUser ? 'Logado' : 'Deslogado');
+    
+    if (currentUser) {
+        const user = JSON.parse(currentUser);
+        if (loginBtn) loginBtn.style.display = 'none';
+        if (userInfo) {
+            userInfo.style.display = 'inline-block';
+            userInfo.textContent = `👤 ${user.username}`;
+        }
+        if (logoutBtn) logoutBtn.style.display = 'inline-block';
+    } else {
+        if (loginBtn) loginBtn.style.display = 'inline-block';
+        if (userInfo) userInfo.style.display = 'none';
+        if (logoutBtn) logoutBtn.style.display = 'none';
     }
-    localStorage.setItem('users', JSON.stringify(users));
-    sessionStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
-    return true;
-}
+};
 
-function removeFavorite(type, id) {
-    const user = getCurrentUser();
-    if (!user) return false;
-    const userIndex = users.findIndex(u => u.id === user.id);
-    if (userIndex === -1) return false;
-    if (type === 'player') users[userIndex].favorites.players = users[userIndex].favorites.players.filter(p => p.id !== id);
-    else if (type === 'team') users[userIndex].favorites.teams = users[userIndex].favorites.teams.filter(t => t.id !== id);
-    else if (type === 'lineup') users[userIndex].favorites.lineups = users[userIndex].favorites.lineups.filter(l => l.id !== id);
-    localStorage.setItem('users', JSON.stringify(users));
-    sessionStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
-    return true;
-}
+window.handleLogout = function() {
+    sessionStorage.removeItem('currentUser');
+    window.updateUserStatus();
+    alert('Você saiu da sua conta!');
+    location.reload();
+};
 
-function isFavorite(type, id) {
-    const user = getCurrentUser();
-    if (!user) return false;
-    if (type === 'player') return user.favorites.players.some(p => p.id === id);
-    else if (type === 'team') return user.favorites.teams.some(t => t.id === id);
-    else if (type === 'lineup') return user.favorites.lineups.some(l => l.id === id);
-    return false;
-}
+// ==================== CONFIGURAR MODAIS ====================
 
-document.addEventListener('DOMContentLoaded', () => {
+function setupAuthModals() {
     const loginModal = document.getElementById('loginModal');
     const registerModal = document.getElementById('registerModal');
     const loginBtn = document.getElementById('loginBtn');
@@ -106,22 +93,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const regUsername = document.getElementById('regUsername');
     const registerError = document.getElementById('registerError');
 
-    if (loginBtn) loginBtn.addEventListener('click', () => loginModal.classList.add('active'));
-    if (showRegisterBtn) showRegisterBtn.addEventListener('click', (e) => { e.preventDefault(); loginModal.classList.remove('active'); registerModal.classList.add('active'); });
-    if (showLoginBtn) showLoginBtn.addEventListener('click', (e) => { e.preventDefault(); registerModal.classList.remove('active'); loginModal.classList.add('active'); });
-    if (closeLoginBtn) closeLoginBtn.addEventListener('click', () => loginModal.classList.remove('active'));
-    if (closeRegisterBtn) closeRegisterBtn.addEventListener('click', () => registerModal.classList.remove('active'));
+    // Abrir modal de login
+    if (loginBtn) {
+        loginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (loginModal) loginModal.classList.add('active');
+        });
+    }
 
+    // Alternar entre modais
+    if (showRegisterBtn) {
+        showRegisterBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (loginModal) loginModal.classList.remove('active');
+            if (registerModal) registerModal.classList.add('active');
+        });
+    }
+
+    if (showLoginBtn) {
+        showLoginBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (registerModal) registerModal.classList.remove('active');
+            if (loginModal) loginModal.classList.add('active');
+        });
+    }
+
+    // Fechar modais
+    if (closeLoginBtn) {
+        closeLoginBtn.addEventListener('click', () => {
+            if (loginModal) loginModal.classList.remove('active');
+        });
+    }
+
+    if (closeRegisterBtn) {
+        closeRegisterBtn.addEventListener('click', () => {
+            if (registerModal) registerModal.classList.remove('active');
+        });
+    }
+
+    // Fechar ao clicar fora
     window.addEventListener('click', (e) => {
         if (e.target === loginModal) loginModal.classList.remove('active');
         if (e.target === registerModal) registerModal.classList.remove('active');
     });
 
+    // Força da senha
     if (regPassword) {
         regPassword.addEventListener('input', () => {
             const username = regUsername ? regUsername.value : '';
             const password = regPassword.value;
             const strength = getPasswordStrength(password, username);
+            
             let strengthBar = document.querySelector('.password-strength');
             if (!strengthBar && password.length > 0) {
                 strengthBar = document.createElement('div');
@@ -133,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const bar = strengthBar.querySelector('.password-strength-bar');
                 bar.className = `password-strength-bar ${strength.level}`;
             }
+            
             const hint = document.getElementById('passwordHint');
             if (hint) {
                 if (strength.level === 'weak') hint.style.color = '#ff9b9b';
@@ -142,17 +165,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Login form
     if (loginForm) {
         loginForm.addEventListener('submit', (e) => {
             e.preventDefault();
             const identifier = document.getElementById('loginUsername').value;
             const password = document.getElementById('loginPassword').value;
             const result = loginUser(identifier, password);
-            if (result.success) { loginModal.classList.remove('active'); location.reload(); }
-            else alert(result.message);
+            
+            if (result.success) {
+                if (loginModal) loginModal.classList.remove('active');
+                window.updateUserStatus();
+                alert('Login realizado com sucesso!');
+                location.reload();
+            } else {
+                alert(result.message);
+            }
         });
     }
 
+    // Register form
     if (registerForm) {
         registerForm.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -161,14 +193,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const password = document.getElementById('regPassword').value;
             const confirmPassword = document.getElementById('regConfirmPassword').value;
             const result = registerUser(username, email, password, confirmPassword);
+            
             if (result.success) {
                 alert(result.message);
-                registerModal.classList.remove('active');
-                loginModal.classList.add('active');
+                if (registerModal) registerModal.classList.remove('active');
+                if (loginModal) loginModal.classList.add('active');
+                if (registerError) registerError.style.display = 'none';
             } else {
-                if (registerError) { registerError.textContent = result.message; registerError.style.display = 'block'; }
-                else alert(result.message);
+                if (registerError) {
+                    registerError.textContent = result.message;
+                    registerError.style.display = 'block';
+                } else {
+                    alert(result.message);
+                }
             }
+        });
+    }
+}
+
+// Inicializar quando o DOM estiver pronto
+document.addEventListener('DOMContentLoaded', () => {
+    setupAuthModals();
+    window.updateUserStatus();
+    
+    // Configurar logout
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            window.handleLogout();
         });
     }
 });

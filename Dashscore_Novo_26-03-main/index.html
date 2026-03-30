@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashscore</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <style>
+        .players-fav-card {
+            background: #ececec;
+            border-radius: 30px;
+            box-shadow: 10px 10px 0px rgba(0, 0, 0, 0.15);
+            padding: 28px;
+            margin-top: 30px;
+        }
+        
+        .players-fav-card h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #222;
+            border-left: 5px solid #3f5da8;
+            padding-left: 15px;
+        }
+        
+        .players-fav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .player-fav-item {
+            background: white;
+            border-radius: 20px;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s, box-shadow 0.2s;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .player-fav-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        
+        .player-fav-avatar {
+            width: 60px;
+            height: 60px;
+            background: #3f5da8;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: white;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .player-fav-avatar img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 50%;
+        }
+        
+        .player-fav-info {
+            flex: 1;
+        }
+        
+        .player-fav-info h4 {
+            font-size: 18px;
+            margin-bottom: 5px;
+            color: #333;
+        }
+        
+        .player-fav-info p {
+            font-size: 12px;
+            color: #666;
+            margin: 2px 0;
+        }
+        
+        .fav-star {
+            font-size: 28px;
+            cursor: pointer;
+            transition: 0.2s;
+            color: #ccc;
+            flex-shrink: 0;
+        }
+        
+        .fav-star.active {
+            color: #ffd966;
+            text-shadow: 0 0 5px #ffb347;
+        }
+        
+        .fav-star:hover {
+            transform: scale(1.1);
+        }
+        
+        .filter-buttons {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-btn {
+            background: #e0e0e0;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .filter-btn img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            border-radius: 50%;
+            background: white;
+            padding: 2px;
+        }
+        
+        .filter-btn.active {
+            background: #3f5da8;
+            color: white;
+        }
+        
+        .filter-btn:hover {
+            background: #2f4b93;
+            color: white;
+        }
+        
+        .favorites-section {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #ddd;
+        }
+        
+        .favorites-section h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            color: #3f5da8;
+        }
+        
+        .empty-favorites {
+            text-align: center;
+            padding: 40px;
+            color: #999;
+            font-style: italic;
+        }
+        
+        .club-shield-small {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            margin-right: 8px;
+            border-radius: 50%;
+            background: white;
+            padding: 2px;
+        }
+        
+        /* Botão de transferências */
+        .transfer-link {
+            display: inline-block;
+            background: #ff8c00;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-decoration: none;
+            margin-top: 15px;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+        
+        .transfer-link:hover {
+            background: #e67e22;
+            transform: translateY(-2px);
+        }
+        
+        .buttons-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <div class="logo">
+            <img src="images/logo.png" class="logo-icon" alt="Logo Dashscore">
+            DASHSCORE
+        </div>
+
+        <div class="search">
+            <img src="images/search.png" class="search-icon" alt="Pesquisar">
+            <input type="text" placeholder="Pesquisar jogadores, clubes e seleções" id="homeSearch">
+        </div>
+
+        <div class="menu-icons">
+            <img src="images/shield.png" class="icon" alt="Escudo">
+            <button class="login" id="loginBtn">ENTRAR</button>
+            <span class="menu-symbol" id="userInfo" style="display: none;">👤</span>
+            <span class="menu-symbol" id="logoutBtn" style="display: none;">🚪</span>
+            <span class="menu-symbol">⚙️</span>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="card big-left hero-card">
+            <div class="hero-content">
+                <p class="tag">Modo principal</p>
+                <h1>Monte sua escalação no Fut Fantasy</h1>
+                <p class="hero-text">
+                    Escolha jogadores por preço, país e time. Crie seu elenco ideal em uma experiência inspirada em sites reais.
+                </p>
+                <div class="buttons-group">
+                    <a href="fantasy.html" class="btn-main">Abrir Fut Fantasy</a>
+                    <a href="transfers.html" class="transfer-link">🔄 Mercado de Transferências</a>
+                </div>
+            </div>
+        </section>
+
+        <div class="middle">
+            <section class="card small info-card">
+                <h3>Como funciona</h3>
+                <p>Monte times, compare jogadores e organize sua escalação de forma rápida e visual.</p>
+            </section>
+
+            <section class="card small info-card" id="userStatusCard">
+                <h3>Bem-vindo!</h3>
+                <div id="userStatusContent">
+                    <p>Faça login para salvar suas escalações favoritas e ter acesso a recursos exclusivos!</p>
+                </div>
+            </section>
+        </div>
+
+        <section class="card big-right clubs-card">
+            <h2>Clubes e seleções</h2>
+            <div class="club-list" id="clubList">
+                <span data-club="brasil"><img src="images/escudos/escudo-brasil.png" class="club-shield-small" alt="Brasil"> Brasil</span>
+                <span data-club="flamengo"><img src="images/escudos/escudo-flamengo.png" class="club-shield-small" alt="Flamengo"> Flamengo</span>
+                <span data-club="corinthians"><img src="images/escudos/escudo-corinthians.png" class="club-shield-small" alt="Corinthians"> Corinthians</span>
+                <span data-club="palmeiras"><img src="images/escudos/escudo-palmeiras.png" class="club-shield-small" alt="Palmeiras"> Palmeiras</span>
+                <span data-club="saopaulo"><img src="images/escudos/escudo-saopaulo.png" class="club-shield-small" alt="São Paulo"> São Paulo</span>
+                <span data-club="santos"><img src="images/escudos/escudo-santos.png" class="club-shield-small" alt="Santos"> Santos</span>
+                <span data-club="botafogo"><img src="images/escudos/escudo-botafogo.png" class="club-shield-small" alt="Botafogo"> Botafogo</span>
+                <span data-club="atletico-mg"><img src="images/escudos/escudo-atletico-mg.png" class="club-shield-small" alt="Atlético-MG"> Atlético-MG</span>
+                <span data-club="gremio"><img src="images/escudos/escudo-gremio.png" class="club-shield-small" alt="Grêmio"> Grêmio</span>
+                <span data-club="internacional"><img src="images/escudos/escudo-inter.png" class="club-shield-small" alt="Internacional"> Internacional</span>
+                <span data-club="cruzeiro"><img src="images/escudos/escudo-cruzeiro.png" class="club-shield-small" alt="Cruzeiro"> Cruzeiro</span>
+                <span data-club="vasco"><img src="images/escudos/escudo-vasco.png" class="club-shield-small" alt="Vasco"> Vasco</span>
+                <span data-club="bahia"><img src="images/escudos/escudo-bahia.png" class="club-shield-small" alt="Bahia"> Bahia</span>
+                <span data-club="vitoria"><img src="images/escudos/escudo-vitoria.png" class="club-shield-small" alt="Vitória"> Vitória</span>
+            </div>
+        </section>
+    </main>
+
+    <!-- Card de Jogadores Favoritos -->
+    <div class="players-fav-card" id="playersFavCard">
+        <h2>⭐ Jogadores em Destaque - Brasileirão 2026</h2>
+        
+        <div class="filter-buttons" id="filterButtons">
+            <button class="filter-btn active" data-filter="all">⚽ Todos</button>
+            <button class="filter-btn" data-filter="Flamengo"><img src="images/escudos/escudo-flamengo.png" alt=""> Flamengo</button>
+            <button class="filter-btn" data-filter="Palmeiras"><img src="images/escudos/escudo-palmeiras.png" alt=""> Palmeiras</button>
+            <button class="filter-btn" data-filter="Corinthians"><img src="images/escudos/escudo-corinthians.png" alt=""> Corinthians</button>
+            <button class="filter-btn" data-filter="São Paulo"><img src="images/escudos/escudo-saopaulo.png" alt=""> São Paulo</button>
+            <button class="filter-btn" data-filter="Santos"><img src="images/escudos/escudo-santos.png" alt=""> Santos</button>
+            <button class="filter-btn" data-filter="Botafogo"><img src="images/escudos/escudo-botafogo.png" alt=""> Botafogo</button>
+            <button class="filter-btn" data-filter="Atlético-MG"><img src="images/escudos/escudo-atletico-mg.png" alt=""> Atlético-MG</button>
+            <button class="filter-btn" data-filter="Grêmio"><img src="images/escudos/escudo-gremio.png" alt=""> Grêmio</button>
+            <button class="filter-btn" data-filter="Internacional"><img src="images/escudos/escudo-inter.png" alt=""> Internacional</button>
+            <button class="filter-btn" data-filter="Cruzeiro"><img src="images/escudos/escudo-cruzeiro.png" alt=""> Cruzeiro</button>
+            <button class="filter-btn" data-filter="Vasco"><img src="images/escudos/escudo-vasco.png" alt=""> Vasco</button>
+            <button class="filter-btn" data-filter="Bahia"><img src="images/escudos/escudo-bahia.png" alt=""> Bahia</button>
+            <button class="filter-btn" data-filter="Vitória"><img src="images/escudos/escudo-vitoria.png" alt=""> Vitória</button>
+        </div>
+        
+        <div class="players-fav-grid" id="playersFavGrid">
+            <!-- Jogadores serão inseridos aqui via JavaScript -->
+        </div>
+        
+        <div class="favorites-section" id="favoritesSection">
+            <h3>❤️ Seus Jogadores Favoritos</h3>
+            <div id="userFavoritesList" class="players-fav-grid">
+                <div class="empty-favorites">Faça login e comece a favoritar seus jogadores!</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        <p>Dashscore © 2026</p>
+    </footer>
+
+    <!-- Modal de Login -->
+    <div class="auth-modal-overlay" id="loginModal">
+        <div class="auth-modal">
+            <div class="auth-modal-header">
+                <h2>Entrar na sua conta</h2>
+                <button class="auth-close" id="closeLoginBtn">&times;</button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="loginForm">
+                    <div class="auth-input-group">
+                        <label>Usuário ou Email</label>
+                        <input type="text" id="loginUsername" placeholder="Digite seu usuário ou email" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Senha</label>
+                        <input type="password" id="loginPassword" placeholder="Digite sua senha" required>
+                    </div>
+                    <button type="submit" class="auth-btn-primary">Entrar</button>
+                </form>
+                <p class="auth-switch">Não tem uma conta? <a href="#" id="showRegisterBtn">Cadastre-se</a></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Cadastro -->
+    <div class="auth-modal-overlay" id="registerModal">
+        <div class="auth-modal">
+            <div class="auth-modal-header">
+                <h2>Criar conta</h2>
+                <button class="auth-close" id="closeRegisterBtn">&times;</button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="registerForm">
+                    <div class="auth-input-group">
+                        <label>Usuário</label>
+                        <input type="text" id="regUsername" placeholder="Escolha um nome de usuário" required>
+                        <small class="input-hint">Mínimo 3 caracteres</small>
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" placeholder="seu@email.com" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Senha</label>
+                        <input type="password" id="regPassword" placeholder="Crie uma senha forte" required>
+                        <small class="input-hint" id="passwordHint">
+                            • Mínimo 8 caracteres<br>
+                            • Pelo menos 1 letra maiúscula e 1 minúscula<br>
+                            • Pelo menos 1 caractere especial (!@#$%^&*)<br>
+                            • Não pode conter seu nome de usuário
+                        </small>
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Confirmar Senha</label>
+                        <input type="password" id="regConfirmPassword" placeholder="Confirme sua senha" required>
+                    </div>
+                    <div id="registerError" class="auth-error"></div>
+                    <button type="submit" class="auth-btn-primary">Cadastrar</button>
+                </form>
+                <p class="auth-switch">Já tem uma conta? <a href="#" id="showLoginBtn">Faça login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/auth.js"></script>
+    <script>
+        // Função para retornar o caminho do escudo baseado no clube
+        function getClubShield(clubName) {
+            const clubMap = {
+                "Flamengo": "escudo-flamengo.png",
+                "Palmeiras": "escudo-palmeiras.png",
+                "Corinthians": "escudo-corinthians.png",
+                "São Paulo": "escudo-saopaulo.png",
+                "Santos": "escudo-santos.png",
+                "Botafogo": "escudo-botafogo.png",
+                "Atlético-MG": "escudo-atletico-mg.png",
+                "Grêmio": "escudo-gremio.png",
+                "Internacional": "escudo-inter.png",
+                "Cruzeiro": "escudo-cruzeiro.png",
+                "Vasco": "escudo-vasco.png",
+                "Bahia": "escudo-bahia.png",
+                "Vitória": "escudo-vitoria.png"
+            };
+            const fileName = clubMap[clubName];
+            if (fileName) return `images/escudos/${fileName}`;
+            return null;
+        }
+
+        // Função para retornar o caminho da imagem do jogador
+        function getPlayerImage(playerName) {
+            const nameMap = {
+                "Lucas Paquetá": "lucas-paqueta.png", "Pedro": "pedro.png", "Gerson": "gerson.png",
+                "Arrascaeta": "arrascaeta.png", "Samuel Lino": "samuel-lino.png", "Léo Ortiz": "leo-ortiz.png",
+                "Danilo": "danilo.png", "Emerson Royal": "emerson-royal.png", "Ayrton Lucas": "ayrton-lucas.png",
+                "Erick Pulgar": "erick-pulgar.png", "Agustín Rossi": "rossi.png", "Everton Cebolinha": "everton-cebolinha.png",
+                "Luiz Araújo": "luiz-araujo.png", "Gonzalo Plata": "gonzalo-plata.png", "Nicolás de la Cruz": "nicolas-de-la-cruz.png",
+                "Vitor Roque": "vitor-roque.png", "Andreas Pereira": "andreas-pereira.png", "Raphael Veiga": "raphael-veiga.png",
+                "Richard Ríos": "richard-rios.png", "Flaco López": "flaco-lopez.png", "Gustavo Gómez": "gustavo-gomez.png",
+                "Murilo": "murilo.png", "Piquerez": "piquerez.png", "Khellven": "khellven.png", "Carlos Miguel": "carlos-miguel.png",
+                "Mauricio": "mauricio.png", "Marlon Freitas": "marlon-freitas.png", "Fuchs": "fuchs.png",
+                "Memphis Depay": "memphis-depay.png", "Yuri Alberto": "yuri-alberto.png", "Rodrigo Garro": "rodrigo-garro.png",
+                "André Carrillo": "andre-carrillo.png", "Raniele": "raniele.png", "André Ramalho": "andre-ramalho.png",
+                "Matheuzinho": "matheuzinho.png", "Hugo Souza": "hugo-souza.png", "Gustavo Henrique": "gustavo-henrique.png",
+                "Matheus Bidu": "matheus-bidu.png", "Breno Bidon": "breno-bidon.png",
+                "Lucas Moura": "lucas-moura.png", "Calleri": "calleri.png", "Oscar": "oscar.png", "Luciano": "luciano.png",
+                "Marcos Antônio": "marcos-antonio.png", "Arboleda": "arboleda.png", "Alan Franco": "alan-franco.png",
+                "Wendell": "wendell.png", "Rafael": "rafael.png", "Igor Vinícius": "igor-vinicius.png", "Ferreira": "ferreira.png",
+                "Bobadilla": "bobadilla.png",
+                "Lautaro Díaz": "lautaro-diaz.png", "Rollheiser": "rollheiser.png", "Barreal": "barreal.png",
+                "Gabriel Menino": "gabriel-menino.png", "Zé Rafael": "ze-rafael.png", "Zé Ivaldo": "ze-ivaldo.png",
+                "Luan Peres": "luan-peres.png", "Vinicius Lira": "vinicius-lira.png", "Igor Vinicius": "igor-vinicius-santos.png",
+                "Gabriel Brazão": "gabriel-brazao.png", "Wesley": "wesley-santos.png",
+                "Arthur Cabral": "arthur-cabral.png", "Artur": "artur.png", "Vitinho": "vitinho-botafogo.png",
+                "Alex Telles": "alex-telles.png", "Barboza": "barboza.png", "Danilo Barbosa": "danilo-barbosa.png",
+                "Léo Linck": "leo-linck.png", "Newton": "newton.png", "Santi Rodríguez": "santi-rodriguez.png",
+                "Bastos": "bastos.png", "Júnior Santos": "junior-santos.png", "Cuiabano": "cuiabano.png",
+                "Hulk": "hulk.png", "Dudu": "dudu.png", "Paulinho": "paulinho.png", "Renan Lodi": "renan-lodi.png",
+                "Everson": "everson.png", "Maycon": "maycon.png", "Bernard": "bernard.png", "Zaracho": "zaracho.png",
+                "Alonso": "alonso.png", "Ruan Tressoldi": "ruan-tressoldi.png",
+                "Carlos Vinicius": "carlos-vinicius.png", "Tetê": "tete.png", "Cristaldo": "cristaldo.png",
+                "Amuzu": "amuzu.png", "Arthur": "arthur-gremio.png", "Wagner Leonardo": "wagner-leonardo.png",
+                "Marlon": "marlon-gremio.png", "Weverton": "weverton-gremio.png", "Kannemann": "kannemann.png",
+                "Villasanti": "villasanti.png", "João Pedro": "joao-pedro.png",
+                "Rafael Borré": "rafael-borre.png", "Enner Valencia": "enner-valencia.png", "Alan Patrick": "alan-patrick.png",
+                "Bernabei": "bernabei.png", "Rochet": "rochet.png", "Wanderson": "wanderson.png", "Mercado": "mercado.png",
+                "Bruno Henrique": "bruno-henrique.png", "Bustos": "bustos.png", "Vitão": "vitao.png", "Maurício": "mauricio-internacional.png",
+                "Kaio Jorge": "kaio-jorge.png", "Matheus Pereira": "matheus-pereira-cruzeiro.png", "Fabrício Bruno": "fabricio-bruno.png",
+                "Cássio": "cassio.png", "William": "william.png", "Marlon": "marlon-cruzeiro.png", "Lucas Romero": "lucas-romero.png",
+                "Lucas Silva": "lucas-silva.png", "Wanderson": "wanderson-cruzeiro.png", "Villalba": "villalba.png", "Ramiro": "ramiro.png",
+                "Philippe Coutinho": "philippe-coutinho.png", "Dimitri Payet": "dimitri-payet.png", "Thiago Mendes": "thiago-mendes.png",
+                "Robert Renan": "robert-renan.png", "Piton": "piton.png", "Léo Jardim": "leo-jardim.png", "Adson": "adson.png",
+                "David": "david.png", "Hugo Moura": "hugo-moura.png", "Paulo Henrique": "paulo-henrique.png", "GB": "gb.png",
+                "Willian José": "willian-jose.png", "Everton Ribeiro": "everton-ribeiro.png", "Jean Lucas": "jean-lucas.png",
+                "Acevedo": "acevedo.png", "Ronaldo": "ronaldo-bahia.png", "Cauly": "cauly.png", "Luciano Juba": "luciano-juba.png",
+                "Ademir": "ademir.png", "Erick Pulga": "erick-pulga.png", "Kanu": "kanu.png", "Gilberto": "gilberto.png",
+                "Erick": "erick.png", "Aitor": "aitor.png", "Ramon": "ramon.png", "Riccieli": "riccieli.png", "Gabriel": "gabriel-vitoria.png",
+                "Osvaldo": "osvaldo.png", "Wesley": "wesley-vitoria.png", "Léo Gomes": "leo-gomes.png", "Zeca": "zeca.png",
+                "Rodrigo Andrade": "rodrigo-andrade.png", "Camutanga": "camutanga.png"
+            };
+            const fileName = nameMap[playerName];
+            if (fileName) return `images/jogadores/${fileName}`;
+            return null;
+        }
+
+        // Lista de jogadores (TODOS OS 153 JOGADORES)
+        const featuredPlayers = [
+            // FLAMENGO
+            { id: 1, name: "Lucas Paquetá", club: "Flamengo", nationality: "Brasil", position: "CAM", value: "€35M", flag: "🇧🇷" },
+            { id: 2, name: "Pedro", club: "Flamengo", nationality: "Brasil", position: "ST", value: "€17M", flag: "🇧🇷" },
+            { id: 3, name: "Gerson", club: "Flamengo", nationality: "Brasil", position: "CM", value: "€22M", flag: "🇧🇷" },
+            { id: 4, name: "Arrascaeta", club: "Flamengo", nationality: "Uruguai", position: "CAM", value: "€15M", flag: "🇺🇾" },
+            { id: 5, name: "Samuel Lino", club: "Flamengo", nationality: "Brasil", position: "LW", value: "€17M", flag: "🇧🇷" },
+            { id: 6, name: "Léo Ortiz", club: "Flamengo", nationality: "Brasil", position: "CB", value: "€14M", flag: "🇧🇷" },
+            { id: 7, name: "Danilo", club: "Flamengo", nationality: "Brasil", position: "CB", value: "€2.5M", flag: "🇧🇷" },
+            { id: 8, name: "Emerson Royal", club: "Flamengo", nationality: "Brasil", position: "RB", value: "€7M", flag: "🇧🇷" },
+            { id: 9, name: "Ayrton Lucas", club: "Flamengo", nationality: "Brasil", position: "LB", value: "€4M", flag: "🇧🇷" },
+            { id: 10, name: "Erick Pulgar", club: "Flamengo", nationality: "Chile", position: "CDM", value: "€5M", flag: "🇨🇱" },
+            { id: 11, name: "Agustín Rossi", club: "Flamengo", nationality: "Argentina", position: "GK", value: "€10M", flag: "🇦🇷" },
+            { id: 12, name: "Everton Cebolinha", club: "Flamengo", nationality: "Brasil", position: "LW", value: "€7M", flag: "🇧🇷" },
+            { id: 13, name: "Luiz Araújo", club: "Flamengo", nationality: "Brasil", position: "RW", value: "€7M", flag: "🇧🇷" },
+            { id: 14, name: "Gonzalo Plata", club: "Flamengo", nationality: "Equador", position: "RW", value: "€8M", flag: "🇪🇨" },
+            { id: 15, name: "Nicolás de la Cruz", club: "Flamengo", nationality: "Uruguai", position: "CM", value: "€9M", flag: "🇺🇾" },
+            
+            // PALMEIRAS
+            { id: 16, name: "Vitor Roque", club: "Palmeiras", nationality: "Brasil", position: "ST", value: "€45M", flag: "🇧🇷" },
+            { id: 17, name: "Andreas Pereira", club: "Palmeiras", nationality: "Brasil", position: "CM", value: "€18M", flag: "🇧🇷" },
+            { id: 18, name: "Raphael Veiga", club: "Palmeiras", nationality: "Brasil", position: "CAM", value: "€15M", flag: "🇧🇷" },
+            { id: 19, name: "Richard Ríos", club: "Palmeiras", nationality: "Colômbia", position: "CM", value: "€12M", flag: "🇨🇴" },
+            { id: 20, name: "Flaco López", club: "Palmeiras", nationality: "Argentina", position: "ST", value: "€12M", flag: "🇦🇷" },
+            { id: 21, name: "Gustavo Gómez", club: "Palmeiras", nationality: "Paraguai", position: "CB", value: "€8M", flag: "🇵🇾" },
+            { id: 22, name: "Murilo", club: "Palmeiras", nationality: "Brasil", position: "CB", value: "€7M", flag: "🇧🇷" },
+            { id: 23, name: "Piquerez", club: "Palmeiras", nationality: "Uruguai", position: "LB", value: "€12M", flag: "🇺🇾" },
+            { id: 24, name: "Khellven", club: "Palmeiras", nationality: "Brasil", position: "RB", value: "€6M", flag: "🇧🇷" },
+            { id: 25, name: "Carlos Miguel", club: "Palmeiras", nationality: "Brasil", position: "GK", value: "€8M", flag: "🇧🇷" },
+            { id: 26, name: "Mauricio", club: "Palmeiras", nationality: "Brasil", position: "CAM", value: "€10M", flag: "🇧🇷" },
+            { id: 27, name: "Marlon Freitas", club: "Palmeiras", nationality: "Brasil", position: "CM", value: "€9M", flag: "🇧🇷" },
+            { id: 28, name: "Fuchs", club: "Palmeiras", nationality: "Brasil", position: "CB", value: "€5M", flag: "🇧🇷" },
+            
+            // CORINTHIANS
+            { id: 29, name: "Memphis Depay", club: "Corinthians", nationality: "Holanda", position: "LW", value: "€12M", flag: "🇳🇱" },
+            { id: 30, name: "Yuri Alberto", club: "Corinthians", nationality: "Brasil", position: "ST", value: "€12M", flag: "🇧🇷" },
+            { id: 31, name: "Rodrigo Garro", club: "Corinthians", nationality: "Argentina", position: "CAM", value: "€14M", flag: "🇦🇷" },
+            { id: 32, name: "André Carrillo", club: "Corinthians", nationality: "Peru", position: "CM", value: "€4M", flag: "🇵🇪" },
+            { id: 33, name: "Raniele", club: "Corinthians", nationality: "Brasil", position: "CDM", value: "€6M", flag: "🇧🇷" },
+            { id: 34, name: "André Ramalho", club: "Corinthians", nationality: "Brasil", position: "CB", value: "€4M", flag: "🇧🇷" },
+            { id: 35, name: "Matheuzinho", club: "Corinthians", nationality: "Brasil", position: "RB", value: "€7M", flag: "🇧🇷" },
+            { id: 36, name: "Hugo Souza", club: "Corinthians", nationality: "Brasil", position: "GK", value: "€6M", flag: "🇧🇷" },
+            { id: 37, name: "Gustavo Henrique", club: "Corinthians", nationality: "Brasil", position: "CB", value: "€5M", flag: "🇧🇷" },
+            { id: 38, name: "Matheus Bidu", club: "Corinthians", nationality: "Brasil", position: "LB", value: "€4M", flag: "🇧🇷" },
+            { id: 39, name: "Breno Bidon", club: "Corinthians", nationality: "Brasil", position: "CM", value: "€5M", flag: "🇧🇷" },
+            
+            // SÃO PAULO
+            { id: 40, name: "Lucas Moura", club: "São Paulo", nationality: "Brasil", position: "RW", value: "€15M", flag: "🇧🇷" },
+            { id: 41, name: "Calleri", club: "São Paulo", nationality: "Argentina", position: "ST", value: "€12M", flag: "🇦🇷" },
+            { id: 42, name: "Oscar", club: "São Paulo", nationality: "Brasil", position: "CAM", value: "€8M", flag: "🇧🇷" },
+            { id: 43, name: "Luciano", club: "São Paulo", nationality: "Brasil", position: "ST", value: "€8M", flag: "🇧🇷" },
+            { id: 44, name: "Marcos Antônio", club: "São Paulo", nationality: "Brasil", position: "CM", value: "€7M", flag: "🇧🇷" },
+            { id: 45, name: "Arboleda", club: "São Paulo", nationality: "Equador", position: "CB", value: "€5M", flag: "🇪🇨" },
+            { id: 46, name: "Alan Franco", club: "São Paulo", nationality: "Argentina", position: "CB", value: "€6M", flag: "🇦🇷" },
+            { id: 47, name: "Wendell", club: "São Paulo", nationality: "Brasil", position: "LB", value: "€5M", flag: "🇧🇷" },
+            { id: 48, name: "Rafael", club: "São Paulo", nationality: "Brasil", position: "GK", value: "€3M", flag: "🇧🇷" },
+            { id: 49, name: "Igor Vinícius", club: "São Paulo", nationality: "Brasil", position: "RB", value: "€3M", flag: "🇧🇷" },
+            { id: 50, name: "Ferreira", club: "São Paulo", nationality: "Brasil", position: "LW", value: "€7M", flag: "🇧🇷" },
+            { id: 51, name: "Bobadilla", club: "São Paulo", nationality: "Paraguai", position: "CM", value: "€6M", flag: "🇵🇾" },
+            
+            // SANTOS
+            { id: 52, name: "Lautaro Díaz", club: "Santos", nationality: "Argentina", position: "ST", value: "€6M", flag: "🇦🇷" },
+            { id: 53, name: "Rollheiser", club: "Santos", nationality: "Argentina", position: "RW", value: "€7M", flag: "🇦🇷" },
+            { id: 54, name: "Barreal", club: "Santos", nationality: "Argentina", position: "LW", value: "€6M", flag: "🇦🇷" },
+            { id: 55, name: "Gabriel Menino", club: "Santos", nationality: "Brasil", position: "CM", value: "€5M", flag: "🇧🇷" },
+            { id: 56, name: "Zé Rafael", club: "Santos", nationality: "Brasil", position: "CM", value: "€6M", flag: "🇧🇷" },
+            { id: 57, name: "Zé Ivaldo", club: "Santos", nationality: "Brasil", position: "CB", value: "€4M", flag: "🇧🇷" },
+            { id: 58, name: "Luan Peres", club: "Santos", nationality: "Brasil", position: "CB", value: "€4M", flag: "🇧🇷" },
+            { id: 59, name: "Vinicius Lira", club: "Santos", nationality: "Brasil", position: "LB", value: "€2M", flag: "🇧🇷" },
+            { id: 60, name: "Igor Vinicius", club: "Santos", nationality: "Brasil", position: "RB", value: "€3M", flag: "🇧🇷" },
+            { id: 61, name: "Gabriel Brazão", club: "Santos", nationality: "Brasil", position: "GK", value: "€4M", flag: "🇧🇷" },
+            { id: 62, name: "Wesley", club: "Santos", nationality: "Brasil", position: "RW", value: "€3M", flag: "🇧🇷" },
+            
+            // BOTAFOGO
+            { id: 63, name: "Arthur Cabral", club: "Botafogo", nationality: "Brasil", position: "ST", value: "€12M", flag: "🇧🇷" },
+            { id: 64, name: "Artur", club: "Botafogo", nationality: "Brasil", position: "RW", value: "€10M", flag: "🇧🇷" },
+            { id: 65, name: "Vitinho", club: "Botafogo", nationality: "Brasil", position: "LW", value: "€8M", flag: "🇧🇷" },
+            { id: 66, name: "Alex Telles", club: "Botafogo", nationality: "Brasil", position: "LB", value: "€7M", flag: "🇧🇷" },
+            { id: 67, name: "Barboza", club: "Botafogo", nationality: "Argentina", position: "CB", value: "€6M", flag: "🇦🇷" },
+            { id: 68, name: "Danilo Barbosa", club: "Botafogo", nationality: "Brasil", position: "CM", value: "€5M", flag: "🇧🇷" },
+            { id: 69, name: "Léo Linck", club: "Botafogo", nationality: "Brasil", position: "GK", value: "€3M", flag: "🇧🇷" },
+            { id: 70, name: "Newton", club: "Botafogo", nationality: "Brasil", position: "CM", value: "€6M", flag: "🇧🇷" },
+            { id: 71, name: "Santi Rodríguez", club: "Botafogo", nationality: "Argentina", position: "CAM", value: "€7M", flag: "🇦🇷" },
+            { id: 72, name: "Bastos", club: "Botafogo", nationality: "Angola", position: "CB", value: "€4M", flag: "🇦🇴" },
+            { id: 73, name: "Júnior Santos", club: "Botafogo", nationality: "Brasil", position: "ST", value: "€5M", flag: "🇧🇷" },
+            { id: 74, name: "Cuiabano", club: "Botafogo", nationality: "Brasil", position: "LB", value: "€4M", flag: "🇧🇷" },
+            
+            // ATLÉTICO-MG
+            { id: 75, name: "Hulk", club: "Atlético-MG", nationality: "Brasil", position: "ST", value: "€6M", flag: "🇧🇷" },
+            { id: 76, name: "Dudu", club: "Atlético-MG", nationality: "Brasil", position: "LW", value: "€8M", flag: "🇧🇷" },
+            { id: 77, name: "Paulinho", club: "Atlético-MG", nationality: "Brasil", position: "RW", value: "€12M", flag: "🇧🇷" },
+            { id: 78, name: "Renan Lodi", club: "Atlético-MG", nationality: "Brasil", position: "LB", value: "€8M", flag: "🇧🇷" },
+            { id: 79, name: "Alan Franco", club: "Atlético-MG", nationality: "Argentina", position: "CM", value: "€6M", flag: "🇦🇷" },
+            { id: 80, name: "Everson", club: "Atlético-MG", nationality: "Brasil", position: "GK", value: "€4M", flag: "🇧🇷" },
+            { id: 81, name: "Maycon", club: "Atlético-MG", nationality: "Brasil", position: "CM", value: "€5M", flag: "🇧🇷" },
+            { id: 82, name: "Bernard", club: "Atlético-MG", nationality: "Brasil", position: "LW", value: "€5M", flag: "🇧🇷" },
+            { id: 83, name: "Zaracho", club: "Atlético-MG", nationality: "Argentina", position: "CAM", value: "€8M", flag: "🇦🇷" },
+            { id: 84, name: "Alonso", club: "Atlético-MG", nationality: "Paraguai", position: "CB", value: "€5M", flag: "🇵🇾" },
+            { id: 85, name: "Ruan Tressoldi", club: "Atlético-MG", nationality: "Brasil", position: "CB", value: "€6M", flag: "🇧🇷" },
+            
+            // GRÊMIO
+            { id: 86, name: "Carlos Vinicius", club: "Grêmio", nationality: "Brasil", position: "ST", value: "€8M", flag: "🇧🇷" },
+            { id: 87, name: "Tetê", club: "Grêmio", nationality: "Brasil", position: "RW", value: "€9M", flag: "🇧🇷" },
+            { id: 88, name: "Cristaldo", club: "Grêmio", nationality: "Argentina", position: "CAM", value: "€7M", flag: "🇦🇷" },
+            { id: 89, name: "Amuzu", club: "Grêmio", nationality: "Bélgica", position: "LW", value: "€8M", flag: "🇧🇪" },
+            { id: 90, name: "Arthur", club: "Grêmio", nationality: "Brasil", position: "CM", value: "€7M", flag: "🇧🇷" },
+            { id: 91, name: "Wagner Leonardo", club: "Grêmio", nationality: "Brasil", position: "CB", value: "€5M", flag: "🇧🇷" },
+            { id: 92, name: "Marlon", club: "Grêmio", nationality: "Brasil", position: "LB", value: "€5M", flag: "🇧🇷" },
+            { id: 93, name: "Weverton", club: "Grêmio", nationality: "Brasil", position: "GK", value: "€5M", flag: "🇧🇷" },
+            { id: 94, name: "Kannemann", club: "Grêmio", nationality: "Argentina", position: "CB", value: "€4M", flag: "🇦🇷" },
+            { id: 95, name: "Villasanti", club: "Grêmio", nationality: "Paraguai", position: "CM", value: "€7M", flag: "🇵🇾" },
+            { id: 96, name: "João Pedro", club: "Grêmio", nationality: "Brasil", position: "RB", value: "€3M", flag: "🇧🇷" },
+            
+            // INTERNACIONAL
+            { id: 97, name: "Rafael Borré", club: "Internacional", nationality: "Colômbia", position: "ST", value: "€7M", flag: "🇨🇴" },
+            { id: 98, name: "Enner Valencia", club: "Internacional", nationality: "Equador", position: "ST", value: "€8M", flag: "🇪🇨" },
+            { id: 99, name: "Alan Patrick", club: "Internacional", nationality: "Brasil", position: "CAM", value: "€9M", flag: "🇧🇷" },
+            { id: 100, name: "Bernabei", club: "Internacional", nationality: "Argentina", position: "LB", value: "€7M", flag: "🇦🇷" },
+            { id: 101, name: "Rochet", club: "Internacional", nationality: "Uruguai", position: "GK", value: "€6M", flag: "🇺🇾" },
+            { id: 102, name: "Wanderson", club: "Internacional", nationality: "Brasil", position: "LW", value: "€7M", flag: "🇧🇷" },
+            { id: 103, name: "Mercado", club: "Internacional", nationality: "Argentina", position: "CB", value: "€3M", flag: "🇦🇷" },
+            { id: 104, name: "Bruno Henrique", club: "Internacional", nationality: "Brasil", position: "CM", value: "€5M", flag: "🇧🇷" },
+            { id: 105, name: "Bustos", club: "Internacional", nationality: "Argentina", position: "RB", value: "€4M", flag: "🇦🇷" },
+            { id: 106, name: "Vitão", club: "Internacional", nationality: "Brasil", position: "CB", value: "€5M", flag: "🇧🇷" },
+            { id: 107, name: "Maurício", club: "Internacional", nationality: "Brasil", position: "RW", value: "€5M", flag: "🇧🇷" },
+            
+            // CRUZEIRO
+            { id: 108, name: "Kaio Jorge", club: "Cruzeiro", nationality: "Brasil", position: "ST", value: "€8M", flag: "🇧🇷" },
+            { id: 109, name: "Matheus Pereira", club: "Cruzeiro", nationality: "Brasil", position: "CAM", value: "€12M", flag: "🇧🇷" },
+            { id: 110, name: "Fabrício Bruno", club: "Cruzeiro", nationality: "Brasil", position: "CB", value: "€8M", flag: "🇧🇷" },
+            { id: 111, name: "Cássio", club: "Cruzeiro", nationality: "Brasil", position: "GK", value: "€3M", flag: "🇧🇷" },
+            { id: 112, name: "William", club: "Cruzeiro", nationality: "Brasil", position: "RB", value: "€4M", flag: "🇧🇷" },
+            { id: 113, name: "Marlon", club: "Cruzeiro", nationality: "Brasil", position: "LB", value: "€4M", flag: "🇧🇷" },
+            { id: 114, name: "Lucas Romero", club: "Cruzeiro", nationality: "Argentina", position: "CDM", value: "€5M", flag: "🇦🇷" },
+            { id: 115, name: "Lucas Silva", club: "Cruzeiro", nationality: "Brasil", position: "CM", value: "€2M", flag: "🇧🇷" },
+            { id: 116, name: "Wanderson", club: "Cruzeiro", nationality: "Brasil", position: "LW", value: "€6M", flag: "🇧🇷" },
+            { id: 117, name: "Villalba", club: "Cruzeiro", nationality: "Paraguai", position: "CB", value: "€5M", flag: "🇵🇾" },
+            { id: 118, name: "Ramiro", club: "Cruzeiro", nationality: "Brasil", position: "CM", value: "€2M", flag: "🇧🇷" },
+            
+            // VASCO
+            { id: 119, name: "Philippe Coutinho", club: "Vasco", nationality: "Brasil", position: "CAM", value: "€8M", flag: "🇧🇷" },
+            { id: 120, name: "Dimitri Payet", club: "Vasco", nationality: "França", position: "CAM", value: "€5M", flag: "🇫🇷" },
+            { id: 121, name: "Thiago Mendes", club: "Vasco", nationality: "Brasil", position: "CDM", value: "€4M", flag: "🇧🇷" },
+            { id: 122, name: "Robert Renan", club: "Vasco", nationality: "Brasil", position: "CB", value: "€5M", flag: "🇧🇷" },
+            { id: 123, name: "Piton", club: "Vasco", nationality: "Brasil", position: "LB", value: "€4M", flag: "🇧🇷" },
+            { id: 124, name: "Léo Jardim", club: "Vasco", nationality: "Brasil", position: "GK", value: "€5M", flag: "🇧🇷" },
+            { id: 125, name: "Adson", club: "Vasco", nationality: "Brasil", position: "RW", value: "€4M", flag: "🇧🇷" },
+            { id: 126, name: "David", club: "Vasco", nationality: "Brasil", position: "LW", value: "€3M", flag: "🇧🇷" },
+            { id: 127, name: "Hugo Moura", club: "Vasco", nationality: "Brasil", position: "CM", value: "€2M", flag: "🇧🇷" },
+            { id: 128, name: "Paulo Henrique", club: "Vasco", nationality: "Brasil", position: "RB", value: "€2M", flag: "🇧🇷" },
+            { id: 129, name: "GB", club: "Vasco", nationality: "Brasil", position: "ST", value: "€4M", flag: "🇧🇷" },
+            
+            // BAHIA
+            { id: 130, name: "Willian José", club: "Bahia", nationality: "Brasil", position: "ST", value: "€7M", flag: "🇧🇷" },
+            { id: 131, name: "Everton Ribeiro", club: "Bahia", nationality: "Brasil", position: "CAM", value: "€3M", flag: "🇧🇷" },
+            { id: 132, name: "Jean Lucas", club: "Bahia", nationality: "Brasil", position: "CM", value: "€6M", flag: "🇧🇷" },
+            { id: 133, name: "Acevedo", club: "Bahia", nationality: "Uruguai", position: "CDM", value: "€5M", flag: "🇺🇾" },
+            { id: 134, name: "Ronaldo", club: "Bahia", nationality: "Brasil", position: "GK", value: "€3M", flag: "🇧🇷" },
+            { id: 135, name: "Cauly", club: "Bahia", nationality: "Brasil", position: "CAM", value: "€5M", flag: "🇧🇷" },
+            { id: 136, name: "Luciano Juba", club: "Bahia", nationality: "Brasil", position: "LB", value: "€4M", flag: "🇧🇷" },
+            { id: 137, name: "Ademir", club: "Bahia", nationality: "Brasil", position: "RW", value: "€5M", flag: "🇧🇷" },
+            { id: 138, name: "Erick Pulga", club: "Bahia", nationality: "Brasil", position: "RW", value: "€5M", flag: "🇧🇷" },
+            { id: 139, name: "Kanu", club: "Bahia", nationality: "Brasil", position: "CB", value: "€3M", flag: "🇧🇷" },
+            { id: 140, name: "Gilberto", club: "Bahia", nationality: "Brasil", position: "RB", value: "€3M", flag: "🇧🇷" },
+            
+            // VITÓRIA
+            { id: 141, name: "Erick", club: "Vitória", nationality: "Brasil", position: "ST", value: "€2M", flag: "🇧🇷" },
+            { id: 142, name: "Aitor", club: "Vitória", nationality: "Espanha", position: "RW", value: "€1.5M", flag: "🇪🇸" },
+            { id: 143, name: "Ramon", club: "Vitória", nationality: "Brasil", position: "CM", value: "€1M", flag: "🇧🇷" },
+            { id: 144, name: "Riccieli", club: "Vitória", nationality: "Brasil", position: "CB", value: "€1M", flag: "🇧🇷" },
+            { id: 145, name: "Gabriel", club: "Vitória", nationality: "Brasil", position: "GK", value: "€800k", flag: "🇧🇷" },
+            { id: 146, name: "Osvaldo", club: "Vitória", nationality: "Brasil", position: "LW", value: "€1.2M", flag: "🇧🇷" },
+            { id: 147, name: "Wesley", club: "Vitória", nationality: "Brasil", position: "ST", value: "€1M", flag: "🇧🇷" },
+            { id: 148, name: "Léo Gomes", club: "Vitória", nationality: "Brasil", position: "LB", value: "€800k", flag: "🇧🇷" },
+            { id: 149, name: "Zeca", club: "Vitória", nationality: "Brasil", position: "RB", value: "€900k", flag: "🇧🇷" },
+            { id: 150, name: "Rodrigo Andrade", club: "Vitória", nationality: "Brasil", position: "CM", value: "€700k", flag: "🇧🇷" },
+            { id: 151, name: "Camutanga", club: "Vitória", nationality: "Brasil", position: "CB", value: "€800k", flag: "🇧🇷" }
+        ];
+
+        let currentFilter = "all";
+        let userFavorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
+        
+        function renderFeaturedPlayers() {
+            const container = document.getElementById('playersFavGrid');
+            if (!container) return;
+            
+            let filtered = featuredPlayers;
+            if (currentFilter !== "all") {
+                filtered = featuredPlayers.filter(p => p.club === currentFilter);
+            }
+            
+            if (filtered.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">Nenhum jogador encontrado para este time.</div>';
+                return;
+            }
+            
+            container.innerHTML = filtered.map(player => {
+                const isFav = userFavorites.some(f => f.id === player.id);
+                const playerImage = getPlayerImage(player.name);
+                const clubShield = getClubShield(player.club);
+                return `
+                    <div class="player-fav-item" data-player-id="${player.id}">
+                        <div class="player-fav-avatar">
+                            ${playerImage ? `<img src="${playerImage}" alt="${player.name}" onerror="this.src='${clubShield || player.flag}'">` : (clubShield ? `<img src="${clubShield}" alt="${player.club}">` : player.flag)}
+                        </div>
+                        <div class="player-fav-info">
+                            <h4>${player.name}</h4>
+                            <p>${player.position} • ${player.club}</p>
+                            <p>${player.nationality} • ${player.value}</p>
+                        </div>
+                        <div class="fav-star ${isFav ? 'active' : ''}" data-id="${player.id}" data-name="${player.name}" data-club="${player.club}" data-nationality="${player.nationality}" data-position="${player.position}" data-value="${player.value}" data-flag="${player.flag}">⭐</div>
+                    </div>
+                `;
+            }).join('');
+            
+            attachStarEvents();
+        }
+        
+        function renderUserFavorites() {
+            const container = document.getElementById('userFavoritesList');
+            if (!container) return;
+            
+            const currentUser = sessionStorage.getItem('currentUser');
+            
+            if (!currentUser) {
+                container.innerHTML = '<div class="empty-favorites">🔒 Faça login para ver seus jogadores favoritos!</div>';
+                return;
+            }
+            
+            if (userFavorites.length === 0) {
+                container.innerHTML = '<div class="empty-favorites">✨ Você ainda não tem jogadores favoritos. Clique na estrela ⭐ ao lado dos jogadores para favoritar!</div>';
+                return;
+            }
+            
+            container.innerHTML = userFavorites.map(player => {
+                const playerImage = getPlayerImage(player.name);
+                const clubShield = getClubShield(player.club);
+                return `
+                    <div class="player-fav-item">
+                        <div class="player-fav-avatar">
+                            ${playerImage ? `<img src="${playerImage}" alt="${player.name}" onerror="this.src='${clubShield || player.flag}'">` : (clubShield ? `<img src="${clubShield}" alt="${player.club}">` : player.flag)}
+                        </div>
+                        <div class="player-fav-info">
+                            <h4>${player.name}</h4>
+                            <p>${player.position} • ${player.club}</p>
+                            <p>${player.nationality} • ${player.value}</p>
+                        </div>
+                        <div class="fav-star active" data-id="${player.id}" data-name="${player.name}" data-club="${player.club}" data-nationality="${player.nationality}" data-position="${player.position}" data-value="${player.value}" data-flag="${player.flag}">⭐</div>
+                    </div>
+                `;
+            }).join('');
+            
+            attachFavoriteStarEvents();
+        }
+        
+        function attachStarEvents() {
+            document.querySelectorAll('#playersFavGrid .fav-star').forEach(star => {
+                star.removeEventListener('click', star._listener);
+                const listener = (e) => {
+                    e.stopPropagation();
+                    const currentUser = sessionStorage.getItem('currentUser');
+                    if (!currentUser) {
+                        alert('⚠️ Faça login para favoritar jogadores!');
+                        document.getElementById('loginModal').classList.add('active');
+                        return;
+                    }
+                    
+                    const playerId = parseInt(star.dataset.id);
+                    const isFavorited = userFavorites.some(f => f.id === playerId);
+                    
+                    if (isFavorited) {
+                        userFavorites = userFavorites.filter(f => f.id !== playerId);
+                        star.classList.remove('active');
+                        alert(`⭐ ${star.dataset.name} removido dos favoritos!`);
+                    } else {
+                        const newFavorite = {
+                            id: playerId,
+                            name: star.dataset.name,
+                            club: star.dataset.club,
+                            nationality: star.dataset.nationality,
+                            position: star.dataset.position,
+                            value: star.dataset.value,
+                            flag: star.dataset.flag,
+                            favoritedAt: new Date().toISOString()
+                        };
+                        userFavorites.push(newFavorite);
+                        star.classList.add('active');
+                        alert(`❤️ ${star.dataset.name} adicionado aos favoritos!`);
+                    }
+                    
+                    localStorage.setItem('userFavorites', JSON.stringify(userFavorites));
+                    renderUserFavorites();
+                };
+                star.addEventListener('click', listener);
+                star._listener = listener;
+            });
+        }
+        
+        function attachFavoriteStarEvents() {
+            document.querySelectorAll('#userFavoritesList .fav-star').forEach(star => {
+                star.removeEventListener('click', star._listener);
+                const listener = (e) => {
+                    e.stopPropagation();
+                    const playerId = parseInt(star.dataset.id);
+                    userFavorites = userFavorites.filter(f => f.id !== playerId);
+                    localStorage.setItem('userFavorites', JSON.stringify(userFavorites));
+                    star.closest('.player-fav-item').remove();
+                    if (userFavorites.length === 0) {
+                        renderUserFavorites();
+                    }
+                    renderFeaturedPlayers();
+                    alert(`⭐ ${star.dataset.name} removido dos favoritos!`);
+                };
+                star.addEventListener('click', listener);
+                star._listener = listener;
+            });
+        }
+        
+        function setupFilters() {
+            const filterButtons = document.querySelectorAll('.filter-btn');
+            filterButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    currentFilter = btn.dataset.filter;
+                    renderFeaturedPlayers();
+                });
+            });
+        }
+        
+        document.querySelectorAll('.club-list span').forEach(club => {
+            club.addEventListener('click', () => {
+                const clubName = club.dataset.club;
+                window.location.href = `pages/${clubName}.html`;
+            });
+        });
+        
+        const homeSearch = document.getElementById('homeSearch');
+        if (homeSearch) {
+            homeSearch.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const clubSpans = document.querySelectorAll('.club-list span');
+                clubSpans.forEach(span => {
+                    const text = span.textContent.toLowerCase();
+                    if (text.includes(searchTerm)) {
+                        span.style.display = 'inline-flex';
+                    } else {
+                        span.style.display = 'none';
+                    }
+                });
+            });
+        }
+        
+        function updateUserStatus() {
+            const currentUser = sessionStorage.getItem('currentUser');
+            const userStatusCard = document.getElementById('userStatusContent');
+            const loginBtn = document.getElementById('loginBtn');
+            const userInfo = document.getElementById('userInfo');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            userFavorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
+            renderUserFavorites();
+            renderFeaturedPlayers();
+
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                if (userStatusCard) {
+                    userStatusCard.innerHTML = `
+                        <p style="color: #2ecc71;">✅ Logado como: <strong>${user.username}</strong></p>
+                        <p>Email: ${user.email}</p>
+                        <p>Você tem acesso a todas as funcionalidades!</p>
+                    `;
+                }
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (userInfo) {
+                    userInfo.style.display = 'inline-block';
+                    userInfo.textContent = `👤 ${user.username}`;
+                }
+                if (logoutBtn) logoutBtn.style.display = 'inline-block';
+            } else {
+                if (userStatusCard) {
+                    userStatusCard.innerHTML = `
+                        <p>Faça login para salvar suas escalações favoritas e ter acesso a recursos exclusivos!</p>
+                        <button class="btn-main" style="padding: 8px 16px; font-size: 14px; margin-top: 10px;" id="quickLoginBtn">Fazer Login</button>
+                    `;
+                    const quickLoginBtn = document.getElementById('quickLoginBtn');
+                    if (quickLoginBtn) {
+                        quickLoginBtn.addEventListener('click', () => {
+                            document.getElementById('loginModal').classList.add('active');
+                        });
+                    }
+                }
+                if (loginBtn) loginBtn.style.display = 'inline-block';
+                if (userInfo) userInfo.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+            }
+        }
+        
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('currentUser');
+                updateUserStatus();
+                alert('Você saiu da sua conta!');
+            });
+        }
+        
+        updateUserStatus();
+        renderFeaturedPlayers();
+        setupFilters();
+    </script>
+
+</body>
+</html>

@@ -690,11 +690,45 @@ async function loadLastUpdateInfo() {
 
 // Botão de atualização - abre instruções
 document.getElementById('manualUpdateBtn')?.addEventListener('click', () => {
+    // Mostrar última atualização
+function mostrarUltimaAtualizacao() {
+    fetch('public/data/brasileirao.json')
+        .then(res => res.json())
+        .then(data => {
+            const info = document.getElementById('infoAtualizacao');
+            if (info) {
+                info.innerHTML = `📅 Última atualização: ${data.last_update}`;
+            }
+        })
+        .catch(() => {});
+}
+
+// Botão de atualização
+document.getElementById('atualizarDadosBtn')?.addEventListener('click', () => {
+    alert('📌 Para atualizar os dados:\n\n1. Abra o terminal na pasta do projeto\n2. Digite: python buscar_jogadores.py\n3. Aguarde a mensagem "FINALIZADO!"\n4. Recarregue esta página (F5)');
+});
+
+mostrarUltimaAtualizacao();
     alert('📌 Para atualizar os dados:\n\n1. Abra o terminal na pasta do projeto\n2. Digite: python update_data.py\n3. Aguarde a mensagem "ATUALIZADO!"\n4. Recarregue esta página');
 });
 
 loadLastUpdateInfo();
 </script>
+
+<div style="text-align: right; margin-bottom: 20px;">
+    <button id="atualizarDadosBtn" class="btn-main" style="background: #ff8c00; padding: 10px 20px;">
+        🔄 Atualizar Dados do Brasileirão
+    </button>
+    <span id="infoAtualizacao" style="margin-left: 15px; color: #aaa; font-size: 12px;"></span>
+    
+</div>
+
+
+<script src="js/load_data.js"></script>
+<!-- Seção de Ranking -->
+<div id="rankingTimes"></div>
+
+<script src="js/estatisticas.js"></script>
 
 </body>
 </html>

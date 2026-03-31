@@ -1,15 +1,11 @@
 @echo off
 echo ========================================
-echo   DASHSCORE - ATUALIZAR DADOS DO FBREF
+echo   ATUALIZANDO DADOS DO BRASILEIRÃO
 echo ========================================
 echo.
-echo Atualizando dados...
-echo.
-
-python update_data.py
-
+python buscar_jogadores.py
 echo.
 echo ========================================
-echo   ATUALIZAÇÃO CONCLUÍDA!
+echo   FINALIZADO! Recarregue o site (F5)
 echo ========================================
 pause

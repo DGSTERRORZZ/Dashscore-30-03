@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cruzeiro - Dashscore</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        .club-hero { background: linear-gradient(135deg, #2c5aa0 0%, #1a3a6a 100%); padding: 60px 40px; border-radius: 30px; margin-bottom: 30px; color: white; text-align: center; }
+        .club-hero h1 { font-size: 48px; margin-bottom: 20px; }
+        .club-hero .club-badge { font-size: 80px; margin-bottom: 20px; }
+        .club-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
+        .stat-card { background: #ececec; border-radius: 20px; padding: 20px; text-align: center; box-shadow: 5px 5px 0 rgba(0,0,0,0.1); }
+        .stat-card h3 { font-size: 14px; color: #666; margin-bottom: 10px; }
+        .stat-card .stat-value { font-size: 32px; font-weight: bold; color: #2c5aa0; }
+        .section-title { font-size: 28px; margin: 30px 0 20px; color: #333; border-left: 5px solid #2c5aa0; padding-left: 15px; }
+        .players-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; margin-bottom: 40px; }
+        .player-card-club { background: #ececec; border-radius: 20px; padding: 15px; display: flex; align-items: center; gap: 15px; transition: transform 0.2s; }
+        .player-card-club:hover { transform: translateY(-5px); }
+        .player-avatar { width: 60px; height: 60px; background: #2c5aa0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; color: white; }
+        .player-info-club h4 { font-size: 18px; margin-bottom: 5px; }
+        .player-info-club p { font-size: 12px; color: #666; }
+        .transfers-list { background: #ececec; border-radius: 20px; padding: 20px; margin-bottom: 30px; }
+        .transfer-item { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #ddd; }
+        .transfer-item:last-child { border-bottom: none; }
+        .history-text { background: #ececec; border-radius: 20px; padding: 25px; line-height: 1.6; margin-bottom: 30px; }
+        .curiosities-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 15px; margin-bottom: 30px; }
+        .curiosity-item { background: #ececec; border-radius: 15px; padding: 15px; border-left: 4px solid #2c5aa0; }
+        .back-btn { display: inline-block; background: #3f5da8; color: white; padding: 12px 24px; border-radius: 12px; text-decoration: none; margin-bottom: 20px; transition: 0.2s; }
+        .back-btn:hover { background: #2f4b93; transform: translateX(-5px); }
+        .favorite-btn { background: none; border: 2px solid #ffd966; border-radius: 30px; padding: 8px 20px; color: #ffd966; cursor: pointer; font-size: 14px; transition: 0.2s; margin-top: 10px; }
+        .favorite-btn.active { background: #ffd966; color: #333; }
+        .favorite-btn:hover { background: #ffd966; color: #333; }
+        .auth-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: none; justify-content: center; align-items: center; z-index: 2000; }
+        .auth-modal-overlay.active { display: flex; }
+        .auth-modal { background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); border-radius: 28px; width: 90%; max-width: 450px; overflow: hidden; }
+        .auth-modal-header { background: #0f0f1a; padding: 24px 28px; border-bottom: 2px solid #3f5da8; display: flex; justify-content: space-between; align-items: center; }
+        .auth-modal-header h2 { color: #fff; margin: 0; font-size: 24px; }
+        .auth-close { background: none; border: none; font-size: 32px; color: #fff; cursor: pointer; }
+        .auth-modal-body { padding: 28px; }
+        .auth-input-group { margin-bottom: 20px; }
+        .auth-input-group label { display: block; margin-bottom: 8px; color: #ddd; font-size: 14px; }
+        .auth-input-group input { width: 100%; padding: 12px 16px; border: 2px solid #2a2a3a; border-radius: 16px; background: #25253a; color: #fff; font-size: 15px; }
+        .auth-input-group input:focus { outline: none; border-color: #3f5da8; }
+        .auth-btn-primary { width: 100%; padding: 14px; background: #3f5da8; border: none; border-radius: 16px; color: white; font-size: 16px; font-weight: bold; cursor: pointer; }
+        .auth-btn-primary:hover { background: #2f4b93; }
+        .auth-switch { text-align: center; margin-top: 20px; color: #aaa; }
+        .auth-switch a { color: #3f5da8; text-decoration: none; }
+        .auth-error { background: rgba(255,75,75,0.2); border-left: 3px solid #ff4b4b; padding: 10px; border-radius: 12px; margin: 15px 0; color: #ff9b9b; font-size: 13px; display: none; }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="logo"><img src="../images/logo.png" class="logo-icon" alt="Logo Dashscore">DASHSCORE</div>
+        <div class="search"><img src="../images/search.png" class="search-icon" alt="Pesquisar"><input type="text" placeholder="Pesquisar jogadores, clubes e seleções"></div>
+        <div class="menu-icons"><img src="../images/shield.png" class="icon" alt="Escudo"><button class="login" id="loginBtn">ENTRAR</button><span class="menu-symbol" id="userInfo" style="display: none;">👤</span><span class="menu-symbol" id="logoutBtn" style="display: none;">🚪</span><span class="menu-symbol">⚙️</span></div>
+    </header>
+    <main style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+        <a href="../index.html" class="back-btn">← Voltar para página inicial</a>
+        <div class="club-hero"><img src="../images/escudos/escudo-cruzeiro.png" alt="Escudo Cruzeiro" style="width: 80px; height: 80px; object-fit: contain; border-radius: 50%; ">
+        <h1>Cruzeiro Esporte Clube</h1><p>A Raposa - Pentacampeão da Copa do Brasil</p><button class="favorite-btn" id="favoriteTeamBtn">⭐ Favoritar Time</button></div>
+        <div class="club-stats"><div class="stat-card"><h3>🏆 Brasileirões</h3><div class="stat-value">4</div><small>1966, 2003, 2013, 2014</small></div><div class="stat-card"><h3>🌎 Libertadores</h3><div class="stat-value">2</div><small>1976, 1997</small></div><div class="stat-card"><h3>🏟️ Estádio</h3><div class="stat-value">Mineirão</div><small>Capacidade: 62.160</small></div><div class="stat-card"><h3>📅 Fundação</h3><div class="stat-value">1921</div><small>2 de janeiro</small></div></div>
+        <h2 class="section-title">⭐ Elenco Principal 2026</h2>
+        <div class="players-grid" id="playersGrid"></div>
+        <h2 class="section-title">🔄 Últimas Transferências</h2>
+        <div class="transfers-list"><div class="transfer-item"><span><strong>Gabriel Barbosa</strong> (Atacante)</span><span>➡️ Chegada - €15M</span><span>Flamengo → Cruzeiro</span></div><div class="transfer-item"><span><strong>Matheus Pereira</strong> (Meia)</span><span>⬅️ Saída - €12M</span><span>Cruzeiro → Corinthians</span></div><div class="transfer-item"><span><strong>Fabrício Bruno</strong> (Zagueiro)</span><span>➡️ Chegada - €8M</span><span>Flamengo → Cruzeiro</span></div><div class="transfer-item"><span><strong>William</strong> (Lateral)</span><span>➡️ Permanência</span><span>Renovação até 2027</span></div><div class="transfer-item"><span><strong>Wanderson</strong> (Atacante)</span><span>➡️ Chegada - €6M</span><span>Internacional → Cruzeiro</span></div></div>
+        <h2 class="section-title">📖 História</h2>
+        <div class="history-text"><p>Fundado em 2 de janeiro de 1921, o Cruzeiro Esporte Clube é um dos clubes mais tradicionais de Minas Gerais e do Brasil. Conhecido como "Raposa", o clube tem uma história rica em conquistas nacionais e internacionais.</p><p style="margin-top: 15px;">A década de 1960 foi marcante com o título da Libertadores de 1976 e o Mundial Interclubes. Nos anos 2000, o Cruzeiro conquistou a "Tríplice Coroa" em 2003: Brasileirão, Copa do Brasil e Campeonato Mineiro. Entre 2013 e 2014, a Raposa conquistou dois Brasileirões consecutivos.</p><p style="margin-top: 15px;">O Cruzeiro é o maior vencedor da Copa do Brasil, com 5 títulos (1993, 1996, 2000, 2003, 2017). O Mineirão, estádio compartilhado com o Atlético-MG, é a casa do clube e palco de grandes conquistas.</p></div>
+        <h2 class="section-title">✨ Curiosidades</h2>
+        <div class="curiosities-list"><div class="curiosity-item"><strong>🏆 Pentacampeão da Copa do Brasil</strong><p>O Cruzeiro é o clube com mais títulos da Copa do Brasil (5).</p></div><div class="curiosity-item"><strong>⚽ Maior artilheiro</strong><p>Tostão, com 249 gols entre 1963-1972.</p></div><div class="curiosity-item"><strong>🌟 Dinamite</strong><p>Time de 1966 conhecido como "Time do Dinamite" por seu futebol explosivo.</p></div><div class="curiosity-item"><strong>🎵 Hino</strong><p>"Cruzeiro, Cruzeiro querido, tão querido pelo Brasil inteiro..."</p></div><div class="curiosity-item"><strong>🌎 Primeiro Campeão da Tríplice Coroa</strong><p>Em 2003, foi o primeiro clube brasileiro a conquistar Brasileiro, Copa do Brasil e Estadual no mesmo ano.</p></div></div>
+    </main>
+    <footer style="text-align: center; padding: 20px; margin-top: 40px;"><p>Dashscore © 2026</p></footer>
+    
+    <div class="auth-modal-overlay" id="loginModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Entrar</h2><button class="auth-close" id="closeLoginBtn">&times;</button></div><div class="auth-modal-body"><form id="loginForm"><div class="auth-input-group"><label>Usuário ou Email</label><input type="text" id="loginUsername" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="loginPassword" required></div><button type="submit" class="auth-btn-primary">Entrar</button></form><p class="auth-switch">Não tem conta? <a href="#" id="showRegisterBtn">Cadastre-se</a></p></div></div></div>
+    <div class="auth-modal-overlay" id="registerModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Criar conta</h2><button class="auth-close" id="closeRegisterBtn">&times;</button></div><div class="auth-modal-body"><form id="registerForm"><div class="auth-input-group"><label>Usuário</label><input type="text" id="regUsername" required></div><div class="auth-input-group"><label>Email</label><input type="email" id="regEmail" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="regPassword" required></div><div class="auth-input-group"><label>Confirmar Senha</label><input type="password" id="regConfirmPassword" required></div><div id="registerError" class="auth-error"></div><button type="submit" class="auth-btn-primary">Cadastrar</button></form><p class="auth-switch">Já tem conta? <a href="#" id="showLoginBtn">Faça login</a></p></div></div></div>
+
+    <script>
+        const cruzeiroSquad = [
+            { name: "Cássio", position: "Goleiro", number: 1 }, { name: "Anderson", position: "Goleiro", number: 12 }, { name: "Denis", position: "Goleiro", number: 30 },
+            { name: "William", position: "Lateral Direito", number: 12 }, { name: "Wesley", position: "Lateral Direito", number: 2 }, { name: "Kaiki", position: "Lateral Direito", number: 27 },
+            { name: "Fabrício Bruno", position: "Zagueiro", number: 4 }, { name: "Zé Ivaldo", position: "Zagueiro", number: 3 }, { name: "Lucas Oliveira", position: "Zagueiro", number: 5 }, { name: "João Marcelo", position: "Zagueiro", number: 34 },
+            { name: "Marlon", position: "Lateral Esquerdo", number: 6 }, { name: "Kaiki Bruno", position: "Lateral Esquerdo", number: 16 }, { name: "Helibelton Palacios", position: "Lateral", number: 22 },
+            { name: "Lucas Romero", position: "Volante", number: 29 }, { name: "Lucas Silva", position: "Volante", number: 16 }, { name: "Ramiro", position: "Volante", number: 17 }, { name: "Filipe Machado", position: "Volante", number: 18 },
+            { name: "Mateus Vital", position: "Meia", number: 7 }, { name: "Matheus Pereira", position: "Meia", number: 10 }, { name: "Nikão", position: "Meia", number: 8 }, { name: "Daniel Jr", position: "Meia", number: 20 },
+            { name: "Gabriel Barbosa", position: "Atacante", number: 9 }, { name: "Kaio Jorge", position: "Atacante", number: 11 }, { name: "Wanderson", position: "Ponta", number: 11 }, { name: "Arthur Gomes", position: "Ponta", number: 19 }, { name: "Bruno Rodrigues", position: "Atacante", number: 21 }
+        ];
+        const playersGrid = document.getElementById('playersGrid');
+        if (playersGrid) { playersGrid.innerHTML = cruzeiroSquad.map(player => `<div class="player-card-club"><div class="player-avatar">${player.number}</div><div class="player-info-club"><h4>${player.name}</h4><p>${player.position}</p></div></div>`).join(''); }
+        const favoriteBtn = document.getElementById('favoriteTeamBtn');
+        if (favoriteBtn) { const isFav = localStorage.getItem('fav_team_cruzeiro'); if (isFav) favoriteBtn.classList.add('active'); favoriteBtn.addEventListener('click', () => { if (localStorage.getItem('currentUser')) { favoriteBtn.classList.toggle('active'); if (favoriteBtn.classList.contains('active')) { localStorage.setItem('fav_team_cruzeiro', 'true'); alert('Cruzeiro adicionado aos favoritos!'); } else { localStorage.removeItem('fav_team_cruzeiro'); alert('Cruzeiro removido dos favoritos!'); } } else { alert('⚠️ Faça login para favoritar times!'); document.getElementById('loginModal').classList.add('active'); } }); }
+        
+        let users = JSON.parse(localStorage.getItem('users') || '[]');
+        function registerUser(username, email, password, confirmPassword) { if (!username || !email || !password || !confirmPassword) return { success: false, message: "Preencha todos os campos!" }; if (password !== confirmPassword) return { success: false, message: "As senhas não coincidem!" }; if (users.find(u => u.username === username)) return { success: false, message: "Usuário já existe!" }; if (users.find(u => u.email === email)) return { success: false, message: "Email já cadastrado!" }; if (password.length < 8) return { success: false, message: "Senha deve ter no mínimo 8 caracteres!" }; if (!/[A-Z]/.test(password)) return { success: false, message: "Senha deve ter pelo menos 1 letra maiúscula!" }; if (!/[a-z]/.test(password)) return { success: false, message: "Senha deve ter pelo menos 1 letra minúscula!" }; if (!/[!@#$%^&*]/.test(password)) return { success: false, message: "Senha deve ter pelo menos 1 caractere especial!" }; if (password.toLowerCase().includes(username.toLowerCase())) return { success: false, message: "Senha não pode conter seu nome de usuário!" }; const newUser = { id: Date.now(), username, email, password, favorites: { players: [], teams: [], lineups: [] }, savedLineups: [] }; users.push(newUser); localStorage.setItem('users', JSON.stringify(users)); return { success: true, message: "Cadastro realizado!" }; }
+        function loginUser(identifier, password) { const user = users.find(u => u.username === identifier || u.email === identifier); if (!user) return { success: false, message: "Usuário não encontrado!" }; if (user.password !== password) return { success: false, message: "Senha incorreta!" }; localStorage.setItem('currentUser', JSON.stringify(user)); return { success: true, message: "Login realizado!" }; }
+        function updateUserStatus() { const currentUser = localStorage.getItem('currentUser'); const loginBtn = document.getElementById('loginBtn'); const userInfo = document.getElementById('userInfo'); const logoutBtn = document.getElementById('logoutBtn'); if (currentUser) { const user = JSON.parse(currentUser); if (loginBtn) loginBtn.style.display = 'none'; if (userInfo) { userInfo.style.display = 'inline-block'; userInfo.textContent = `👤 ${user.username}`; } if (logoutBtn) logoutBtn.style.display = 'inline-block'; } else { if (loginBtn) loginBtn.style.display = 'inline-block'; if (userInfo) userInfo.style.display = 'none'; if (logoutBtn) logoutBtn.style.display = 'none'; } }
+        document.getElementById('logoutBtn')?.addEventListener('click', () => { localStorage.removeItem('currentUser'); updateUserStatus(); alert('Você saiu!'); location.reload(); }); updateUserStatus();
+        const loginModal = document.getElementById('loginModal'), registerModal = document.getElementById('registerModal');
+        document.getElementById('loginBtn')?.addEventListener('click', () => loginModal.classList.add('active'));
+        document.getElementById('showRegisterBtn')?.addEventListener('click', (e) => { e.preventDefault(); loginModal.classList.remove('active'); registerModal.classList.add('active'); });
+        document.getElementById('showLoginBtn')?.addEventListener('click', (e) => { e.preventDefault(); registerModal.classList.remove('active'); loginModal.classList.add('active'); });
+        document.getElementById('closeLoginBtn')?.addEventListener('click', () => loginModal.classList.remove('active'));
+        document.getElementById('closeRegisterBtn')?.addEventListener('click', () => registerModal.classList.remove('active'));
+        window.addEventListener('click', (e) => { if (e.target === loginModal) loginModal.classList.remove('active'); if (e.target === registerModal) registerModal.classList.remove('active'); });
+        document.getElementById('loginForm')?.addEventListener('submit', (e) => { e.preventDefault(); const result = loginUser(document.getElementById('loginUsername').value, document.getElementById('loginPassword').value); if (result.success) { loginModal.classList.remove('active'); location.reload(); } else alert(result.message); });
+        document.getElementById('registerForm')?.addEventListener('submit', (e) => { e.preventDefault(); const result = registerUser(document.getElementById('regUsername').value, document.getElementById('regEmail').value, document.getElementById('regPassword').value, document.getElementById('regConfirmPassword').value); if (result.success) { alert(result.message); registerModal.classList.remove('active'); loginModal.classList.add('active'); } else { document.getElementById('registerError').textContent = result.message; document.getElementById('registerError').style.display = 'block'; } });
+    function updateUserStatus() {
+            const currentUser = sessionStorage.getItem('currentUser');
+            const userStatusCard = document.getElementById('userStatusContent');
+            const loginBtn = document.getElementById('loginBtn');
+            const userInfo = document.getElementById('userInfo');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            // Atualizar favoritos quando o usuário mudar
+            userFavorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
+            renderUserFavorites();
+            renderFeaturedPlayers();
+
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                if (userStatusCard) {
+                    userStatusCard.innerHTML = `
+                        <p style="color: #2ecc71;">✅ Logado como: <strong>${user.username}</strong></p>
+                        <p>Email: ${user.email}</p>
+                        <p>Você tem acesso a todas as funcionalidades!</p>
+                    `;
+                }
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (userInfo) {
+                    userInfo.style.display = 'inline-block';
+                    userInfo.textContent = `👤 ${user.username}`;
+                }
+                if (logoutBtn) logoutBtn.style.display = 'inline-block';
+            } else {
+                if (userStatusCard) {
+                    userStatusCard.innerHTML = `
+                        <p>Faça login para salvar suas escalações favoritas e ter acesso a recursos exclusivos!</p>
+                        <button class="btn-main" style="padding: 8px 16px; font-size: 14px; margin-top: 10px;" id="quickLoginBtn">Fazer Login</button>
+                    `;
+                    const quickLoginBtn = document.getElementById('quickLoginBtn');
+                    if (quickLoginBtn) {
+                        quickLoginBtn.addEventListener('click', () => {
+                            document.getElementById('loginModal').classList.add('active');
+                        });
+                    }
+                }
+                if (loginBtn) loginBtn.style.display = 'inline-block';
+                if (userInfo) userInfo.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+            }
+        }
+        
+        const logoutBtn = document.getElementById('logoutBtn');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', () => {
+                sessionStorage.removeItem('currentUser');
+                updateUserStatus();
+                alert('Você saiu da sua conta!');
+            });
+        }
+        
+        // Inicializar
+        updateUserStatus();
+        renderFeaturedPlayers();
+        setupFilters();
+    </script>
+        <script src="../js/settings.js"></script>
+    <script>
+        // Atualizar status do usuário
+        function updateClubUserStatus() {
+            const currentUser = sessionStorage.getItem('currentUser');
+            const loginBtn = document.getElementById('loginBtn');
+            const userInfo = document.getElementById('userInfo');
+            const logoutBtn = document.getElementById('logoutBtn');
+            
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                if (loginBtn) loginBtn.style.display = 'none';
+                if (userInfo) {
+                    userInfo.style.display = 'inline-block';
+                    userInfo.textContent = `👤 ${user.username}`;
+                }
+                if (logoutBtn) logoutBtn.style.display = 'inline-block';
+            } else {
+                if (loginBtn) loginBtn.style.display = 'inline-block';
+                if (userInfo) userInfo.style.display = 'none';
+                if (logoutBtn) logoutBtn.style.display = 'none';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            updateClubUserStatus();
+            
+            const logoutBtn = document.getElementById('logoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', function() {
+                    sessionStorage.removeItem('currentUser');
+                    updateClubUserStatus();
+                    alert('Você saiu da sua conta!');
+                    location.reload();
+                });
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fut Fantasy - Dashscore</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/auth.css">
+    <style>
+        .modal-filters {
+            padding: 16px 24px;
+            background: #25253a;
+            border-bottom: 1px solid #3f5da8;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+        }
+        .modal-filter-btn {
+            background: #3a3a55;
+            border: none;
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: #fff;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .modal-filter-btn.active {
+            background: #3f5da8;
+            border: 1px solid #ffd966;
+        }
+        .modal-filter-btn:hover {
+            background: #3f5da8;
+        }
+        .clear-filters {
+            background: #c43a3a;
+            margin-left: auto;
+        }
+        .clear-filters:hover {
+            background: #a22a2a;
+        }
+        .modal-header-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        .current-position {
+            background: #3f5da8;
+            padding: 6px 15px;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .player-card .player-icon img {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .player-card .player-icon {
+            padding: 0;
+            overflow: hidden;
+        }
+        .player-info {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+        .active-filter-badge {
+            background: #3f5da8;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 11px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-left: 5px;
+        }
+        .active-filter-badge .remove-filter {
+            cursor: pointer;
+            font-weight: bold;
+            margin-left: 5px;
+        }
+        .active-filter-badge .remove-filter:hover {
+            color: #ff6666;
+        }
+        .total-value-bar {
+            background: #1e1e2a;
+            border-radius: 30px;
+            padding: 8px 20px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #ffd966;
+        }
+        .total-value-label {
+            font-size: 14px;
+            font-weight: bold;
+            color: #ffd966;
+        }
+        .total-value-amount {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .total-value-amount span {
+            color: #ffd966;
+            font-size: 14px;
+        }
+        /* REMOVER SCROLL HORIZONTAL */
+        .pitch-dark {
+            overflow-x: hidden !important;
+        }
+        .pitch-row {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body class="fantasy-body">
+
+    <header class="fantasy-header">
+        <div class="fantasy-header-left">
+            <img src="images/logo.png" alt="Logo" class="fantasy-logo-icon">
+            <h1>DASHSCORE</h1>
+        </div>
+
+        <div class="fantasy-header-center">
+            <img src="images/shield.png" alt="Escudo" class="fantasy-shield">
+        </div>
+
+        <div class="fantasy-header-right">
+            <span class="header-symbol" id="favoriteStarBtn">⭐</span>
+            <span class="header-symbol" id="settingsBtn">⚙️</span>
+        </div>
+    </header>
+
+    <main class="fantasy-page">
+
+        <aside class="fantasy-left">
+            <div class="panel">
+                <h2>Preencher escalação</h2>
+                <p class="panel-subtitle">Clique no + para adicionar jogadores</p>
+
+                <div class="team-search">
+                    <img src="images/search.png" alt="Buscar" class="team-search-icon">
+                    <input type="text" id="globalSearch" placeholder="Procurar jogador por nome, time ou país">
+                </div>
+
+                <p class="team-list-title">Times do Brasileirão 2026</p>
+
+                <div class="team-list" id="teamList">
+                    <div class="team-row" data-team="Flamengo"><img src="images/escudos/escudo-flamengo.png" class="team-shield-icon" alt="Flamengo"><span>Flamengo</span></div>
+                    <div class="team-row" data-team="Palmeiras"><img src="images/escudos/escudo-palmeiras.png" class="team-shield-icon" alt="Palmeiras"><span>Palmeiras</span></div>
+                    <div class="team-row" data-team="Corinthians"><img src="images/escudos/escudo-corinthians.png" class="team-shield-icon" alt="Corinthians"><span>Corinthians</span></div>
+                    <div class="team-row" data-team="São Paulo"><img src="images/escudos/escudo-saopaulo.png" class="team-shield-icon" alt="São Paulo"><span>São Paulo</span></div>
+                    <div class="team-row" data-team="Santos"><img src="images/escudos/escudo-santos.png" class="team-shield-icon" alt="Santos"><span>Santos</span></div>
+                    <div class="team-row" data-team="Botafogo"><img src="images/escudos/escudo-botafogo.png" class="team-shield-icon" alt="Botafogo"><span>Botafogo</span></div>
+                    <div class="team-row" data-team="Atlético-MG"><img src="images/escudos/escudo-atletico-mg.png" class="team-shield-icon" alt="Atlético-MG"><span>Atlético-MG</span></div>
+                    <div class="team-row" data-team="Grêmio"><img src="images/escudos/escudo-gremio.png" class="team-shield-icon" alt="Grêmio"><span>Grêmio</span></div>
+                    <div class="team-row" data-team="Internacional"><img src="images/escudos/escudo-inter.png" class="team-shield-icon" alt="Internacional"><span>Internacional</span></div>
+                    <div class="team-row" data-team="Cruzeiro"><img src="images/escudos/escudo-cruzeiro.png" class="team-shield-icon" alt="Cruzeiro"><span>Cruzeiro</span></div>
+                    <div class="team-row" data-team="Vasco"><img src="images/escudos/escudo-vasco.png" class="team-shield-icon" alt="Vasco"><span>Vasco</span></div>
+                    <div class="team-row" data-team="Bahia"><img src="images/escudos/escudo-bahia.png" class="team-shield-icon" alt="Bahia"><span>Bahia</span></div>
+                    <div class="team-row" data-team="Vitória"><img src="images/escudos/escudo-vitoria.png" class="team-shield-icon" alt="Vitória"><span>Vitória</span></div>
+                </div>
+            </div>
+
+            <div class="panel saved-panel">
+                <h2>Escalações salvas</h2>
+                <div id="savedLineups">
+                    <p style="font-size: 13px; color: #e0e0e0;">Nenhuma escalação salva ainda.</p>
+                </div>
+            </div>
+        </aside>
+
+        <section class="fantasy-center-wrap">
+            <div class="builder-title">Criador de escalação Dashscore - Brasileirão 2026</div>
+            
+            <div class="total-value-bar">
+                <span class="total-value-label">💰 VALOR TOTAL DO TIME</span>
+                <span class="total-value-amount" id="totalTeamValue">€0</span>
+            </div>
+
+            <div class="fantasy-center">
+                <div class="builder-toolbar">
+                    <button class="toolbar-btn dropdown-btn" id="formationBtn">4-3-3 ▼</button>
+                    <div style="flex:1"></div>
+                    <div id="activeFiltersDisplay" style="display: flex; gap: 8px; flex-wrap: wrap;"></div>
+                </div>
+
+                <div class="pitch-dark" id="pitch">
+                    <div class="center-circle"></div>
+                    <div class="penalty-box"></div>
+                    <div class="goal-box"></div>
+
+                   <!-- ATAQUE -->
+<div class="pitch-row attack" data-line="attack" id="attackRow">
+    <div class="player-slot" data-position="Ponta Esquerda" data-index="0" data-pos-name="Ponta Esquerda">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Ponta Esq</div>
+        </div>
+        <div class="plus-btn" data-slot="LW">+</div>
+    </div>
+    <div class="player-slot" data-position="Centroavante" data-index="1" data-pos-name="Centroavante">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Centroavante</div>
+        </div>
+        <div class="plus-btn" data-slot="ST">+</div>
+    </div>
+    <div class="player-slot" data-position="Ponta Direita" data-index="2" data-pos-name="Ponta Direita">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Ponta Dir</div>
+        </div>
+        <div class="plus-btn" data-slot="RW">+</div>
+    </div>
+    <div class="player-slot hidden-slot" data-position="Centroavante" data-index="11" style="display: none;" data-pos-name="Centroavante">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Centroavante</div>
+        </div>
+        <div class="plus-btn" data-slot="ST2">+</div>
+    </div>
+</div>
+
+<!-- MEIO-CAMPO -->
+<div class="pitch-row midfield" data-line="midfield" id="midfieldRow">
+    <div class="player-slot" data-position="Meia Central" data-index="3" data-pos-name="Meia Central">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Meia Central</div>
+        </div>
+        <div class="plus-btn" data-slot="CM1">+</div>
+    </div>
+    <div class="player-slot" data-position="Meia Central" data-index="4" data-pos-name="Meia Central">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Meia Central</div>
+        </div>
+        <div class="plus-btn" data-slot="CM2">+</div>
+    </div>
+    <div class="player-slot" data-position="Meia Central" data-index="5" data-pos-name="Meia Central">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Meia Central</div>
+        </div>
+        <div class="plus-btn" data-slot="CM3">+</div>
+    </div>
+    <div class="player-slot hidden-slot" data-position="Meia Central" data-index="12" style="display: none;" data-pos-name="Meia Central">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Meia Central</div>
+        </div>
+        <div class="plus-btn" data-slot="CM4">+</div>
+    </div>
+    <div class="player-slot hidden-slot" data-position="Meia Central" data-index="13" style="display: none;" data-pos-name="Meia Central">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Meia Central</div>
+        </div>
+        <div class="plus-btn" data-slot="CM5">+</div>
+    </div>
+    <div class="player-slot hidden-slot" data-position="Volante" data-index="14" style="display: none;" data-pos-name="Volante">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Volante</div>
+        </div>
+        <div class="plus-btn" data-slot="CDM">+</div>
+    </div>
+    <div class="player-slot hidden-slot" data-position="Meia Atacante" data-index="15" style="display: none;" data-pos-name="Meia Atacante">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Meia Atacante</div>
+        </div>
+        <div class="plus-btn" data-slot="CAM">+</div>
+    </div>
+    <div class="player-slot hidden-slot" data-position="Volante" data-index="16" style="display: none;" data-pos-name="Volante">
+        <div class="player-card empty">
+            <div class="player-icon">👤</div>
+            <div class="player-name">Vago</div>
+            <div class="player-meta">Volante</div>
+        </div>
+        <div class="plus-btn" data-slot="CDM2">+</div>
+    </div>
+</div>
+                    <!-- DEFESA -->
+                    <div class="pitch-row defense" data-line="defense" id="defenseRow">
+                        <div class="player-slot" data-position="Lateral Esquerdo" data-index="6" data-pos-name="Lateral Esquerdo">
+                            <div class="player-card empty">
+                                <div class="player-icon">👤</div>
+                                <div class="player-name">Vago</div>
+                                <div class="player-meta">Lateral Esq</div>
+                                <div class="player-meta">Clique no +</div>
+                            </div>
+                            <div class="plus-btn" data-slot="LB">+</div>
+                        </div>
+                        <div class="player-slot" data-position="Zagueiro" data-index="7" data-pos-name="Zagueiro">
+                            <div class="player-card empty">
+                                <div class="player-icon">👤</div>
+                                <div class="player-name">Vago</div>
+                                <div class="player-meta">Zagueiro</div>
+                                <div class="player-meta">Clique no +</div>
+                            </div>
+                            <div class="plus-btn" data-slot="CB">+</div>
+                        </div>
+                        <div class="player-slot" data-position="Zagueiro" data-index="8" data-pos-name="Zagueiro">
+                            <div class="player-card empty">
+                                <div class="player-icon">👤</div>
+                                <div class="player-name">Vago</div>
+                                <div class="player-meta">Zagueiro</div>
+                                <div class="player-meta">Clique no +</div>
+                            </div>
+                            <div class="plus-btn" data-slot="CB2">+</div>
+                        </div>
+                        <div class="player-slot" data-position="Lateral Direito" data-index="9" data-pos-name="Lateral Direito">
+                            <div class="player-card empty">
+                                <div class="player-icon">👤</div>
+                                <div class="player-name">Vago</div>
+                                <div class="player-meta">Lateral Dir</div>
+                                <div class="player-meta">Clique no +</div>
+                            </div>
+                            <div class="plus-btn" data-slot="RB">+</div>
+                        </div>
+                        <div class="player-slot hidden-slot" data-position="Zagueiro" data-index="16" style="display: none;" data-pos-name="Zagueiro">
+                            <div class="player-card empty">
+                                <div class="player-icon">👤</div>
+                                <div class="player-name">Vago</div>
+                                <div class="player-meta">Zagueiro</div>
+                                <div class="player-meta">Clique no +</div>
+                            </div>
+                            <div class="plus-btn" data-slot="CB3">+</div>
+                        </div>
+                        <div class="player-slot hidden-slot" data-position="Lateral Esquerdo" data-index="17" style="display: none;" data-pos-name="Lateral Esquerdo">
+                            <div class="player-card empty">
+                                <div class="player-icon">👤</div>
+                                <div class="player-name">Vago</div>
+                                <div class="player-meta">Lateral Esq</div>
+                                <div class="player-meta">Clique no +</div>
+                            </div>
+                            <div class="plus-btn" data-slot="LWB">+</div>
+                        </div>
+                        <div class="player-slot hidden-slot" data-position="Lateral Direito" data-index="18" style="display: none;" data-pos-name="Lateral Direito">
+                            <div class="player-card empty">
+                                <div class="player-icon">👤</div>
+                                <div class="player-name">Vago</div>
+                                <div class="player-meta">Lateral Dir</div>
+                                <div class="player-meta">Clique no +</div>
+                            </div>
+                            <div class="plus-btn" data-slot="RWB">+</div>
+                        </div>
+                    </div>
+
+                    <!-- GOLEIRO -->
+                    <div class="pitch-row goalie" data-line="goalie" id="goalieRow">
+                        <div class="player-slot" data-position="Goleiro" data-index="10" data-pos-name="Goleiro">
+                            <div class="player-card empty">
+                                <div class="player-icon">👤</div>
+                                <div class="player-name">Vago</div>
+                                <div class="player-meta">Goleiro</div>
+                                <div class="player-meta">Clique no +</div>
+                            </div>
+                            <div class="plus-btn" data-slot="GK">+</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="builder-footer">
+                    <button class="delete-btn" id="clearLineupBtn">Excluir tudo</button>
+                    <input type="text" placeholder="Insira o nome da escalação" class="lineup-name" id="lineupName">
+                    <button class="save-btn" id="saveLineupBtn">Salvar</button>
+                </div>
+            </div>
+        </section>
+
+        <aside class="fantasy-right">
+            <div class="panel info-panel">
+                <h2>Monte seu 11</h2>
+                <p>
+                    Clique no botão <strong>+</strong> em cada posição para escolher jogadores.
+                </p>
+                <p>
+                    Use os filtros dentro do modal para encontrar jogadores por clube, país ou valor.
+                </p>
+                <p style="margin-top: 12px; font-size: 12px; color: #ffd966;">
+                    ⚽ Dados atualizados - Temporada 2026
+                </p>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- Modal para lista de jogadores com filtros internos -->
+    <div class="modal-overlay" id="playerModal">
+        <div class="players-modal">
+            <div class="modal-header">
+                <div class="modal-header-info">
+                    <h3>Escolha um jogador</h3>
+                    <div class="current-position" id="currentPositionTag"></div>
+                </div>
+                <button class="close-modal" id="closeModalBtn">&times;</button>
+            </div>
+            <div class="modal-filters" id="modalFilters">
+                <input type="text" id="playerSearchInput" placeholder="🔍 Buscar por nome..." style="flex: 1; background: #3a3a55; border: none; padding: 8px 15px; border-radius: 25px; color: #fff;">
+                <button class="modal-filter-btn" id="filterClubBtnModal">🏠 Clube</button>
+                <button class="modal-filter-btn" id="filterCountryBtnModal">🌍 País</button>
+                <button class="modal-filter-btn" id="filterValueBtnModal">💰 Valor</button>
+                <button class="modal-filter-btn" id="filterPositionBtnModal">⚽ Posição</button>
+                <button class="modal-filter-btn clear-filters" id="clearFiltersBtn">Limpar filtros</button>
+            </div>
+            <div class="players-list" id="playersListContainer"></div>
+        </div>
+    </div>
+
+    <!-- Submodais para filtros -->
+    <div class="modal-overlay" id="clubFilterModal">
+        <div class="small-modal">
+            <div class="modal-header">
+                <h3>Filtrar por clube</h3>
+                <button class="close-modal close-club">&times;</button>
+            </div>
+            <div class="filter-list" id="clubFilterList">
+                <button class="filter-option" data-club="all">Todos os clubes</button>
+                <button class="filter-option" data-club="Flamengo"><img src="images/escudos/escudo-flamengo.png" class="filter-shield-icon"> Flamengo</button>
+                <button class="filter-option" data-club="Palmeiras"><img src="images/escudos/escudo-palmeiras.png" class="filter-shield-icon"> Palmeiras</button>
+                <button class="filter-option" data-club="Corinthians"><img src="images/escudos/escudo-corinthians.png" class="filter-shield-icon"> Corinthians</button>
+                <button class="filter-option" data-club="São Paulo"><img src="images/escudos/escudo-saopaulo.png" class="filter-shield-icon"> São Paulo</button>
+                <button class="filter-option" data-club="Santos"><img src="images/escudos/escudo-santos.png" class="filter-shield-icon"> Santos</button>
+                <button class="filter-option" data-club="Botafogo"><img src="images/escudos/escudo-botafogo.png" class="filter-shield-icon"> Botafogo</button>
+                <button class="filter-option" data-club="Atlético-MG"><img src="images/escudos/escudo-atletico-mg.png" class="filter-shield-icon"> Atlético-MG</button>
+                <button class="filter-option" data-club="Grêmio"><img src="images/escudos/escudo-gremio.png" class="filter-shield-icon"> Grêmio</button>
+                <button class="filter-option" data-club="Internacional"><img src="images/escudos/escudo-inter.png" class="filter-shield-icon"> Internacional</button>
+                <button class="filter-option" data-club="Cruzeiro"><img src="images/escudos/escudo-cruzeiro.png" class="filter-shield-icon"> Cruzeiro</button>
+                <button class="filter-option" data-club="Vasco"><img src="images/escudos/escudo-vasco.png" class="filter-shield-icon"> Vasco</button>
+                <button class="filter-option" data-club="Bahia"><img src="images/escudos/escudo-bahia.png" class="filter-shield-icon"> Bahia</button>
+                <button class="filter-option" data-club="Vitória"><img src="images/escudos/escudo-vitoria.png" class="filter-shield-icon"> Vitória</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="countryFilterModal">
+        <div class="small-modal">
+            <div class="modal-header">
+                <h3>Filtrar por país</h3>
+                <button class="close-modal close-country">&times;</button>
+            </div>
+            <div class="filter-list" id="countryFilterList">
+                <button class="filter-option" data-country="all">Todos os países</button>
+                <button class="filter-option" data-country="Brasil">🇧🇷 Brasil</button>
+                <button class="filter-option" data-country="Argentina">🇦🇷 Argentina</button>
+                <button class="filter-option" data-country="Uruguai">🇺🇾 Uruguai</button>
+                <button class="filter-option" data-country="Colômbia">🇨🇴 Colômbia</button>
+                <button class="filter-option" data-country="Equador">🇪🇨 Equador</button>
+                <button class="filter-option" data-country="Paraguai">🇵🇾 Paraguai</button>
+                <button class="filter-option" data-country="Chile">🇨🇱 Chile</button>
+                <button class="filter-option" data-country="Venezuela">🇻🇪 Venezuela</button>
+                <button class="filter-option" data-country="Holanda">🇳🇱 Holanda</button>
+                <button class="filter-option" data-country="Itália">🇮🇹 Itália</button>
+                <button class="filter-option" data-country="Espanha">🇪🇸 Espanha</button>
+                <button class="filter-option" data-country="Bélgica">🇧🇪 Bélgica</button>
+                <button class="filter-option" data-country="França">🇫🇷 França</button>
+                <button class="filter-option" data-country="Peru">🇵🇪 Peru</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="valueFilterModal">
+        <div class="small-modal">
+            <div class="modal-header">
+                <h3>Filtrar por valor</h3>
+                <button class="close-modal close-value">&times;</button>
+            </div>
+            <div class="filter-list" id="valueFilterList">
+                <button class="filter-option" data-value="all">Todos os valores</button>
+                <button class="filter-option" data-value="0-5">Até €5M</button>
+                <button class="filter-option" data-value="5-10">€5M - €10M</button>
+                <button class="filter-option" data-value="10-15">€10M - €15M</button>
+                <button class="filter-option" data-value="15-20">€15M - €20M</button>
+                <button class="filter-option" data-value="20-30">€20M - €30M</button>
+                <button class="filter-option" data-value="30-50">€30M - €50M</button>
+                <button class="filter-option" data-value="50+">Acima de €50M</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="positionFilterModal">
+        <div class="small-modal">
+            <div class="modal-header">
+                <h3>Filtrar por posição</h3>
+                <button class="close-modal close-position">&times;</button>
+            </div>
+            <div class="filter-list" id="positionFilterList">
+                <button class="filter-option" data-position="all">⚽ Todas as posições</button>
+                <button class="filter-option" data-position="Goleiro">🧤 Goleiro</button>
+                <button class="filter-option" data-position="Lateral Esquerdo">⬅️ Lateral Esquerdo</button>
+                <button class="filter-option" data-position="Lateral Direito">➡️ Lateral Direito</button>
+                <button class="filter-option" data-position="Zagueiro">🛡️ Zagueiro</button>
+                <button class="filter-option" data-position="Volante">⚙️ Volante</button>
+                <button class="filter-option" data-position="Meia Central">🎯 Meia Central</button>
+                <button class="filter-option" data-position="Meia Atacante">✨ Meia Atacante</button>
+                <button class="filter-option" data-position="Ponta Esquerda">⚡ Ponta Esquerda</button>
+                <button class="filter-option" data-position="Ponta Direita">⚡ Ponta Direita</button>
+                <button class="filter-option" data-position="Centroavante">🎯 Centroavante</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para filtro de formação -->
+    <div class="modal-overlay" id="formationModal">
+        <div class="small-modal">
+            <div class="modal-header">
+                <h3>Escolha a formação</h3>
+                <button class="close-modal close-formation">&times;</button>
+            </div>
+            <div class="formation-list" id="formationList">
+                <button class="formation-option" data-formation="4-3-3">4-3-3</button>
+                <button class="formation-option" data-formation="4-4-2">4-4-2</button>
+                <button class="formation-option" data-formation="4-2-3-1">4-2-3-1</button>
+                <button class="formation-option" data-formation="3-4-3">3-4-3</button>
+                <button class="formation-option" data-formation="3-5-2">3-5-2</button>
+                <button class="formation-option" data-formation="4-1-2-1-2">4-1-2-1-2 (Diamante)</button>
+                <button class="formation-option" data-formation="5-3-2">5-3-2</button>
+                <button class="formation-option" data-formation="4-5-1">4-5-1</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modais de autenticação -->
+    <div class="auth-modal-overlay" id="loginModal">
+        <div class="auth-modal">
+            <div class="auth-modal-header">
+                <h2>Entrar na sua conta</h2>
+                <button class="auth-close" id="closeLoginBtn">&times;</button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="loginForm">
+                    <div class="auth-input-group">
+                        <label>Usuário ou Email</label>
+                        <input type="text" id="loginUsername" placeholder="Digite seu usuário ou email" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Senha</label>
+                        <input type="password" id="loginPassword" placeholder="Digite sua senha" required>
+                    </div>
+                    <button type="submit" class="auth-btn-primary">Entrar</button>
+                </form>
+                <p class="auth-switch">Não tem uma conta? <a href="#" id="showRegisterBtn">Cadastre-se</a></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="auth-modal-overlay" id="registerModal">
+        <div class="auth-modal">
+            <div class="auth-modal-header">
+                <h2>Criar conta</h2>
+                <button class="auth-close" id="closeRegisterBtn">&times;</button>
+            </div>
+            <div class="auth-modal-body">
+                <form id="registerForm">
+                    <div class="auth-input-group">
+                        <label>Usuário</label>
+                        <input type="text" id="regUsername" placeholder="Escolha um nome de usuário" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Email</label>
+                        <input type="email" id="regEmail" placeholder="seu@email.com" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Senha</label>
+                        <input type="password" id="regPassword" placeholder="Crie uma senha forte" required>
+                    </div>
+                    <div class="auth-input-group">
+                        <label>Confirmar Senha</label>
+                        <input type="password" id="regConfirmPassword" placeholder="Confirme sua senha" required>
+                    </div>
+                    <div id="registerError" class="auth-error"></div>
+                    <button type="submit" class="auth-btn-primary">Cadastrar</button>
+                </form>
+                <p class="auth-switch">Já tem uma conta? <a href="#" id="showLoginBtn">Faça login</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/fantasy.js"></script>
+
+</body>
+</html>

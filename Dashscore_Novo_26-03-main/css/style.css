@@ -1835,3 +1835,32 @@ footer {
         flex-direction: column;
     }
 }
+.player-card-modal {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 12px;
+    background: #2a2a3a;
+    border-radius: 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.player-card-modal:hover {
+    background: #3a3a5a;
+    transform: translateX(5px);
+}
+.player-modal-icon {
+    font-size: 32px;
+}
+.player-modal-info {
+    flex: 1;
+}
+.player-modal-name {
+    font-weight: bold;
+    color: #ffd966;
+}
+.player-modal-team {
+    font-size: 12px;
+    color: #aaa;
+}

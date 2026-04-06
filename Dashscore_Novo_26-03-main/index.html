@@ -273,7 +273,8 @@
     </main>
 
     <!-- Card de Jogadores Favoritos -->
-    <div class="players-fav-card" id="playersFavCard">
+    <div class="players-fav-grid" id="playersFavGrid">
+    <!-- Os jogadores vão aparecer aqui automaticamente -->
         <h2>⭐ Jogadores em Destaque - Brasileirão 2026</h2>
         
         <div class="filter-buttons" id="filterButtons">
@@ -451,41 +452,10 @@
             return null;
         }
 
-        const featuredPlayers = [
-            { id: 1, name: "Lucas Paquetá", club: "Flamengo", nationality: "Brasil", position: "Meia Atacante", value: "€35M", flag: "🇧🇷" },
-            { id: 2, name: "Pedro", club: "Flamengo", nationality: "Brasil", position: "Centroavante", value: "€17M", flag: "🇧🇷" },
-            { id: 3, name: "Vitor Roque", club: "Palmeiras", nationality: "Brasil", position: "Centroavante", value: "€45M", flag: "🇧🇷" },
-            { id: 4, name: "Memphis Depay", club: "Corinthians", nationality: "Holanda", position: "Ponta Esquerda", value: "€12M", flag: "🇳🇱" },
-            { id: 5, name: "Lucas Moura", club: "São Paulo", nationality: "Brasil", position: "Ponta Direita", value: "€15M", flag: "🇧🇷" },
-            { id: 6, name: "Lautaro Díaz", club: "Santos", nationality: "Argentina", position: "Centroavante", value: "€6M", flag: "🇦🇷" },
-            { id: 7, name: "Arthur Cabral", club: "Botafogo", nationality: "Brasil", position: "Centroavante", value: "€12M", flag: "🇧🇷" },
-            { id: 8, name: "Hulk", club: "Atlético-MG", nationality: "Brasil", position: "Centroavante", value: "€6M", flag: "🇧🇷" },
-            { id: 9, name: "Carlos Vinicius", club: "Grêmio", nationality: "Brasil", position: "Centroavante", value: "€8M", flag: "🇧🇷" },
-            { id: 10, name: "Rafael Borré", club: "Internacional", nationality: "Colômbia", position: "Centroavante", value: "€7M", flag: "🇨🇴" },
-            { id: 11, name: "Kaio Jorge", club: "Cruzeiro", nationality: "Brasil", position: "Centroavante", value: "€8M", flag: "🇧🇷" },
-            { id: 12, name: "Philippe Coutinho", club: "Vasco", nationality: "Brasil", position: "Meia Atacante", value: "€8M", flag: "🇧🇷" },
-            { id: 13, name: "Willian José", club: "Bahia", nationality: "Brasil", position: "Centroavante", value: "€7M", flag: "🇧🇷" },
-            { id: 14, name: "Erick", club: "Vitória", nationality: "Brasil", position: "Centroavante", value: "€2M", flag: "🇧🇷" }
-        ];
-
         let currentFilter = "all";
         let userFavorites = JSON.parse(localStorage.getItem('userFavorites') || '[]');
         
-        function renderFeaturedPlayers() {
-            const container = document.getElementById('playersFavGrid');
-            if (!container) return;
-            let filtered = featuredPlayers;
-            if (currentFilter !== "all") filtered = featuredPlayers.filter(p => p.club === currentFilter);
-            if (filtered.length === 0) { container.innerHTML = '<div style="text-align: center; padding: 40px; color: #999;">Nenhum jogador encontrado para este time.</div>'; return; }
-            container.innerHTML = filtered.map(player => {
-                const isFav = userFavorites.some(f => f.id === player.id);
-                const playerImage = getPlayerImage(player.name);
-                const clubShield = getClubShield(player.club);
-                return `<div class="player-fav-item"><div class="player-fav-avatar">${playerImage ? `<img src="${playerImage}" onerror="this.src='${clubShield || player.flag}'">` : (clubShield ? `<img src="${clubShield}">` : player.flag)}</div><div class="player-fav-info"><h4>${player.name}</h4><p>${player.position} • ${player.club}</p><p>${player.nationality} • ${player.value}</p></div><div class="fav-star ${isFav ? 'active' : ''}" data-id="${player.id}" data-name="${player.name}" data-club="${player.club}" data-nationality="${player.nationality}" data-position="${player.position}" data-value="${player.value}" data-flag="${player.flag}">⭐</div></div>`;
-            }).join('');
-            attachStarEvents();
-        }
-        
+    
         function renderUserFavorites() {
             const container = document.getElementById('userFavoritesList');
             if (!container) return;
@@ -690,11 +660,48 @@ async function loadLastUpdateInfo() {
 
 // Botão de atualização - abre instruções
 document.getElementById('manualUpdateBtn')?.addEventListener('click', () => {
+    // Mostrar última atualização
+function mostrarUltimaAtualizacao() {
+    fetch('public/data/brasileirao.json')
+        .then(res => res.json())
+        .then(data => {
+            const info = document.getElementById('infoAtualizacao');
+            if (info) {
+                info.innerHTML = `📅 Última atualização: ${data.last_update}`;
+            }
+        })
+        .catch(() => {});
+}
+
+// Botão de atualização
+document.getElementById('atualizarDadosBtn')?.addEventListener('click', () => {
+    alert('📌 Para atualizar os dados:\n\n1. Abra o terminal na pasta do projeto\n2. Digite: python buscar_jogadores.py\n3. Aguarde a mensagem "FINALIZADO!"\n4. Recarregue esta página (F5)');
+});
+
+mostrarUltimaAtualizacao();
     alert('📌 Para atualizar os dados:\n\n1. Abra o terminal na pasta do projeto\n2. Digite: python update_data.py\n3. Aguarde a mensagem "ATUALIZADO!"\n4. Recarregue esta página');
 });
 
 loadLastUpdateInfo();
 </script>
+
+<div style="text-align: right; margin-bottom: 20px;">
+    <button id="atualizarDadosBtn" class="btn-main" style="background: #ff8c00; padding: 10px 20px;">
+        🔄 Atualizar Dados do Brasileirão
+    </button>
+    <span id="infoAtualizacao" style="margin-left: 15px; color: #aaa; font-size: 12px;"></span>
+    
+</div>
+
+<!-- Seção de Ranking -->
+<div id="rankingTimes"></div>
+<div class="players-fav-grid" id="playersFavGrid">
+    <!-- Os jogadores vão aparecer aqui -->
+</div>
+
+<script src="js/estatisticas.js"></script>
+<script src="js/dados_reais.js"></script>
+<script src="js/load_data.js"></script>
 
 </body>
 </html>

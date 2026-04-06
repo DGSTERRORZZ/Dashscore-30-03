@@ -75,15 +75,8 @@
     <div class="auth-modal-overlay" id="registerModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Criar conta</h2><button class="auth-close" id="closeRegisterBtn">&times;</button></div><div class="auth-modal-body"><form id="registerForm"><div class="auth-input-group"><label>Usuário</label><input type="text" id="regUsername" required></div><div class="auth-input-group"><label>Email</label><input type="email" id="regEmail" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="regPassword" required></div><div class="auth-input-group"><label>Confirmar Senha</label><input type="password" id="regConfirmPassword" required></div><div id="registerError" class="auth-error"></div><button type="submit" class="auth-btn-primary">Cadastrar</button></form><p class="auth-switch">Já tem conta? <a href="#" id="showLoginBtn">Faça login</a></p></div></div></div>
 
     <script>
-        const vascoSquad = [
-            { name: "Léo Jardim", position: "Goleiro", number: 1 }, { name: "Pablo", position: "Goleiro", number: 12 }, { name: "Halliday", position: "Goleiro", number: 32 },
-            { name: "Paulo Henrique", position: "Lateral Direito", number: 2 }, { name: "Puma Rodríguez", position: "Lateral Direito", number: 23 }, { name: "Léo", position: "Lateral Direito", number: 22 },
-            { name: "Robert Renan", position: "Zagueiro", number: 3 }, { name: "Léo Pelé", position: "Zagueiro", number: 4 }, { name: "Maicon", position: "Zagueiro", number: 34 }, { name: "Lyncon", position: "Zagueiro", number: 33 },
-            { name: "Lucas Piton", position: "Lateral Esquerdo", number: 6 }, { name: "Riquelme", position: "Lateral Esquerdo", number: 26 }, { name: "Victor Luis", position: "Lateral Esquerdo", number: 14 },
-            { name: "Thiago Mendes", position: "Volante", number: 5 }, { name: "Hugo Moura", position: "Volante", number: 25 }, { name: "Zé Gabriel", position: "Volante", number: 15 }, { name: "Mateus Carvalho", position: "Volante", number: 17 },
-            { name: "Philippe Coutinho", position: "Meia", number: 11 }, { name: "Dimitri Payet", position: "Meia", number: 10 }, { name: "Jair", position: "Meia", number: 8 }, { name: "Praxedes", position: "Meia", number: 18 },
-            { name: "GB", position: "Atacante", number: 9 }, { name: "David", position: "Atacante", number: 16 }, { name: "Adson", position: "Ponta", number: 7 }, { name: "Rayan", position: "Atacante", number: 77 }, { name: "Erick Marcus", position: "Ponta", number: 19 }
-        ];
+       
+       
         const playersGrid = document.getElementById('playersGrid');
         if (playersGrid) { playersGrid.innerHTML = vascoSquad.map(player => `<div class="player-card-club"><div class="player-avatar">${player.number}</div><div class="player-info-club"><h4>${player.name}</h4><p>${player.position}</p></div></div>`).join(''); }
         const favoriteBtn = document.getElementById('favoriteTeamBtn');
@@ -201,5 +194,7 @@
             }
         });
     </script>
+    <script src="../js/load_data.js"></script>
+<script src="../js/team-squad.js"></script>
 </body>
 </html>

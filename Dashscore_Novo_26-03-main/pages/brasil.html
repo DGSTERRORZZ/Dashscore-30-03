@@ -132,31 +132,8 @@
 
     <script src="../js/auth.js"></script>
     <script>
-        const brasilSquad = [
-            { name: "Alisson", position: "Goleiro", club: "Liverpool", number: 1 },
-            { name: "Ederson", position: "Goleiro", club: "Manchester City", number: 23 },
-            { name: "Bento", position: "Goleiro", club: "Al-Nassr", number: 12 },
-            { name: "Danilo", position: "Lateral Direito", club: "Flamengo", number: 2 },
-            { name: "Emerson Royal", position: "Lateral Direito", club: "Flamengo", number: 13 },
-            { name: "Marquinhos", position: "Zagueiro", club: "PSG", number: 4 },
-            { name: "Éder Militão", position: "Zagueiro", club: "Real Madrid", number: 3 },
-            { name: "Gabriel Magalhães", position: "Zagueiro", club: "Arsenal", number: 14 },
-            { name: "Léo Ortiz", position: "Zagueiro", club: "Flamengo", number: 15 },
-            { name: "Guilherme Arana", position: "Lateral Esquerdo", club: "Atlético-MG", number: 6 },
-            { name: "Caio Henrique", position: "Lateral Esquerdo", club: "Monaco", number: 16 },
-            { name: "Casemiro", position: "Volante", club: "Manchester United", number: 5 },
-            { name: "Bruno Guimarães", position: "Volante", club: "Newcastle", number: 8 },
-            { name: "André", position: "Volante", club: "Wolves", number: 17 },
-            { name: "Lucas Paquetá", position: "Meia", club: "Flamengo", number: 7 },
-            { name: "Raphael Veiga", position: "Meia", club: "Palmeiras", number: 18 },
-            { name: "Vinícius Jr", position: "Ponta Esquerda", club: "Real Madrid", number: 10 },
-            { name: "Rodrygo", position: "Ponta Direita", club: "Real Madrid", number: 11 },
-            { name: "Raphinha", position: "Ponta Direita", club: "Barcelona", number: 19 },
-            { name: "Vitor Roque", position: "Centroavante", club: "Palmeiras", number: 9 },
-            { name: "Endrick", position: "Centroavante", club: "Palmeiras", number: 21 },
-            { name: "Samuel Lino", position: "Ponta Esquerda", club: "Flamengo", number: 20 }
-        ];
-        
+       
+       
         const playersGrid = document.getElementById('playersGrid');
         if (playersGrid) {
             playersGrid.innerHTML = brasilSquad.map(player => `
@@ -191,5 +168,7 @@
             });
         }
     </script>
+    <script src="../js/load_data.js"></script>
+<script src="../js/team-squad.js"></script>
 </body>
 </html>

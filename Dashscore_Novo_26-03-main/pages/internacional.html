@@ -129,16 +129,7 @@
 
     <script src="../js/auth.js"></script>
     <script>
-        const internacionalSquad = [
-            { name: "Sergio Rochet", position: "Goleiro", number: 1 }, { name: "Anthoni", position: "Goleiro", number: 12 },
-            { name: "Bustos", position: "Lateral Direito", number: 16 }, { name: "Nathan", position: "Lateral Direito", number: 22 }, { name: "Igor Gomes", position: "Lateral Direito", number: 2 },
-            { name: "Mercado", position: "Zagueiro", number: 25 }, { name: "Vitão", position: "Zagueiro", number: 44 }, { name: "Gabriel Mercado", position: "Zagueiro", number: 4 }, { name: "Robert Renan", position: "Zagueiro", number: 3 },
-            { name: "Alexander Bernabei", position: "Lateral Esquerdo", number: 6 }, { name: "Renê", position: "Lateral Esquerdo", number: 36 },
-            { name: "Bruno Henrique", position: "Volante", number: 8 }, { name: "Rômulo", position: "Volante", number: 15 }, { name: "Maurício", position: "Volante", number: 27 },
-            { name: "Alan Patrick", position: "Meia", number: 10 }, { name: "Charles Aránguiz", position: "Meia", number: 20 }, { name: "Hyoran", position: "Meia", number: 17 },
-            { name: "Rafael Borré", position: "Atacante", number: 19 }, { name: "Enner Valencia", position: "Atacante", number: 13 }, { name: "Wanderson", position: "Ponta", number: 11 }, { name: "Pedro Henrique", position: "Ponta", number: 28 }
-        ];
-        
+       
         const playersGrid = document.getElementById('playersGrid');
         if (playersGrid) {
             playersGrid.innerHTML = internacionalSquad.map(player => `
@@ -173,5 +164,7 @@
             });
         }
     </script>
+    <script src="../js/load_data.js"></script>
+<script src="../js/team-squad.js"></script>
 </body>
 </html>

@@ -361,6 +361,35 @@ function renderPlayersList() {
         item.addEventListener("click", () => addPlayerToSlot(JSON.parse(item.dataset.player)));
     });
 }
+// fantasy.js - função para listar jogadores reais
+async function listarJogadoresReais(filtroTime = null) {
+    const dados = await carregarDadosBrasileirao();
+    if (!dados) return;
+    
+    let jogadores = dados.players;
+    
+    // Filtrar por time se necessário
+    if (filtroTime && filtroTime !== 'all') {
+        jogadores = jogadores.filter(j => j.team === filtroTime);
+    }
+    
+    const container = document.getElementById('playersListContainer');
+    container.innerHTML = jogadores.map(jogador => `
+        <div class="player-card-modal" onclick="selecionarJogador('${jogador.id}', '${jogador.name}', '${jogador.team}', '${jogador.position}')">
+            <div class="player-modal-icon">⚽</div>
+            <div class="player-modal-info">
+                <div class="player-modal-name">${jogador.name}</div>
+                <div class="player-modal-team">${jogador.team} • ${jogador.position}</div>
+                <div class="player-modal-nationality">${jogador.nationality}</div>
+            </div>
+        </div>
+    `).join('');
+}
+
+// Chamar ao abrir o modal
+document.getElementById('playerModal')?.addEventListener('show', () => {
+    listarJogadoresReais();
+});
 
 // Função para adicionar jogador ao slot (com verificação de repetidos)
 function addPlayerToSlot(player) {

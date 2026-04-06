@@ -75,15 +75,7 @@
     <div class="auth-modal-overlay" id="registerModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Criar conta</h2><button class="auth-close" id="closeRegisterBtn">&times;</button></div><div class="auth-modal-body"><form id="registerForm"><div class="auth-input-group"><label>Usuário</label><input type="text" id="regUsername" required></div><div class="auth-input-group"><label>Email</label><input type="email" id="regEmail" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="regPassword" required></div><div class="auth-input-group"><label>Confirmar Senha</label><input type="password" id="regConfirmPassword" required></div><div id="registerError" class="auth-error"></div><button type="submit" class="auth-btn-primary">Cadastrar</button></form><p class="auth-switch">Já tem conta? <a href="#" id="showLoginBtn">Faça login</a></p></div></div></div>
 
     <script>
-        const cruzeiroSquad = [
-            { name: "Cássio", position: "Goleiro", number: 1 }, { name: "Anderson", position: "Goleiro", number: 12 }, { name: "Denis", position: "Goleiro", number: 30 },
-            { name: "William", position: "Lateral Direito", number: 12 }, { name: "Wesley", position: "Lateral Direito", number: 2 }, { name: "Kaiki", position: "Lateral Direito", number: 27 },
-            { name: "Fabrício Bruno", position: "Zagueiro", number: 4 }, { name: "Zé Ivaldo", position: "Zagueiro", number: 3 }, { name: "Lucas Oliveira", position: "Zagueiro", number: 5 }, { name: "João Marcelo", position: "Zagueiro", number: 34 },
-            { name: "Marlon", position: "Lateral Esquerdo", number: 6 }, { name: "Kaiki Bruno", position: "Lateral Esquerdo", number: 16 }, { name: "Helibelton Palacios", position: "Lateral", number: 22 },
-            { name: "Lucas Romero", position: "Volante", number: 29 }, { name: "Lucas Silva", position: "Volante", number: 16 }, { name: "Ramiro", position: "Volante", number: 17 }, { name: "Filipe Machado", position: "Volante", number: 18 },
-            { name: "Mateus Vital", position: "Meia", number: 7 }, { name: "Matheus Pereira", position: "Meia", number: 10 }, { name: "Nikão", position: "Meia", number: 8 }, { name: "Daniel Jr", position: "Meia", number: 20 },
-            { name: "Gabriel Barbosa", position: "Atacante", number: 9 }, { name: "Kaio Jorge", position: "Atacante", number: 11 }, { name: "Wanderson", position: "Ponta", number: 11 }, { name: "Arthur Gomes", position: "Ponta", number: 19 }, { name: "Bruno Rodrigues", position: "Atacante", number: 21 }
-        ];
+       
         const playersGrid = document.getElementById('playersGrid');
         if (playersGrid) { playersGrid.innerHTML = cruzeiroSquad.map(player => `<div class="player-card-club"><div class="player-avatar">${player.number}</div><div class="player-info-club"><h4>${player.name}</h4><p>${player.position}</p></div></div>`).join(''); }
         const favoriteBtn = document.getElementById('favoriteTeamBtn');
@@ -201,5 +193,7 @@
             }
         });
     </script>
+    <script src="../js/load_data.js"></script>
+<script src="../js/team-squad.js"></script>
 </body>
 </html>

@@ -75,15 +75,7 @@
     <div class="auth-modal-overlay" id="registerModal"><div class="auth-modal"><div class="auth-modal-header"><h2>Criar conta</h2><button class="auth-close" id="closeRegisterBtn">&times;</button></div><div class="auth-modal-body"><form id="registerForm"><div class="auth-input-group"><label>Usuário</label><input type="text" id="regUsername" required></div><div class="auth-input-group"><label>Email</label><input type="email" id="regEmail" required></div><div class="auth-input-group"><label>Senha</label><input type="password" id="regPassword" required></div><div class="auth-input-group"><label>Confirmar Senha</label><input type="password" id="regConfirmPassword" required></div><div id="registerError" class="auth-error"></div><button type="submit" class="auth-btn-primary">Cadastrar</button></form><p class="auth-switch">Já tem conta? <a href="#" id="showLoginBtn">Faça login</a></p></div></div></div>
 
     <script>
-        const vitoriaSquad = [
-            { name: "Gabriel", position: "Goleiro", number: 1 }, { name: "Lucas Arcanjo", position: "Goleiro", number: 12 }, { name: "Muriel", position: "Goleiro", number: 23 },
-            { name: "Zeca", position: "Lateral Direito", number: 2 }, { name: "Raul Cáceres", position: "Lateral Direito", number: 22 }, { name: "Willean Lepo", position: "Lateral Direito", number: 27 },
-            { name: "Riccieli", position: "Zagueiro", number: 4 }, { name: "Camutanga", position: "Zagueiro", number: 3 }, { name: "Dankler", position: "Zagueiro", number: 14 }, { name: "João Victor", position: "Zagueiro", number: 33 },
-            { name: "Léo Gomes", position: "Lateral Esquerdo", number: 6 }, { name: "Patric Calmon", position: "Lateral Esquerdo", number: 16 }, { name: "Hugo", position: "Lateral Esquerdo", number: 26 },
-            { name: "Ramon", position: "Volante", number: 8 }, { name: "Rodrigo Andrade", position: "Volante", number: 5 }, { name: "Léo Ceará", position: "Volante", number: 15 }, { name: "Matheus Trindade", position: "Volante", number: 17 },
-            { name: "Aitor", position: "Meia", number: 7 }, { name: "Osvaldo", position: "Meia", number: 10 }, { name: "Daniel Jr", position: "Meia", number: 11 }, { name: "Edu", position: "Meia", number: 20 },
-            { name: "Erick", position: "Atacante", number: 9 }, { name: "Wesley", position: "Atacante", number: 19 }, { name: "Iury Castilho", position: "Atacante", number: 21 }, { name: "Thiago", position: "Atacante", number: 18 }, { name: "David", position: "Ponta", number: 77 }
-        ];
+        
         const playersGrid = document.getElementById('playersGrid');
         if (playersGrid) { playersGrid.innerHTML = vitoriaSquad.map(player => `<div class="player-card-club"><div class="player-avatar">${player.number}</div><div class="player-info-club"><h4>${player.name}</h4><p>${player.position}</p></div></div>`).join(''); }
         const favoriteBtn = document.getElementById('favoriteTeamBtn');
@@ -201,5 +193,7 @@
             }
         });
     </script>
+    <script src="../js/load_data.js"></script>
+<script src="../js/team-squad.js"></script>
 </body>
 </html>
